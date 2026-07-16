@@ -22,21 +22,19 @@ import { createVehicle } from '../services/vehicleService';
 import toast from 'react-hot-toast';
 
 const CAR_BRANDS = [
-  { slug: 'maruti-suzuki', name: 'Maruti Suzuki', logo: 'https://logo.clearbit.com/marutisuzuki.com' },
-  { slug: 'hyundai', name: 'Hyundai', logo: 'https://logo.clearbit.com/hyundai.com' },
-  { slug: 'tata-motors', name: 'Tata Motors', logo: 'https://logo.clearbit.com/tatamotors.com' },
-  { slug: 'mahindra', name: 'Mahindra', logo: 'https://logo.clearbit.com/mahindra.com' },
-  { slug: 'toyota', name: 'Toyota', logo: 'https://logo.clearbit.com/toyota.com' },
-  { slug: 'kia', name: 'Kia', logo: 'https://logo.clearbit.com/kia.com' }
+  { slug: 'maruti-suzuki', name: 'Maruti Suzuki', logo: 'https://cdn.simpleicons.org/suzuki' },
+  { slug: 'hyundai', name: 'Hyundai', logo: 'https://cdn.simpleicons.org/hyundai' },
+  { slug: 'tata-motors', name: 'Tata Motors', logo: 'https://cdn.simpleicons.org/tata' },
+  { slug: 'mahindra', name: 'Mahindra', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPm379b0tDCoZX8mhj7UWwiQrolB0JAoy40cfPIwiYXQ&s=10' },
+  { slug: 'toyota', name: 'Toyota', logo: 'https://cdn.simpleicons.org/toyota' },
+  { slug: 'kia', name: 'Kia', logo: 'https://cdn.simpleicons.org/kia' }
 ];
 
 const CV_BRANDS = [
-  { slug: 'tata-motors', name: 'Tata Motors', logo: 'https://logo.clearbit.com/tatamotors.com' },
-  { slug: 'ashok-leyland', name: 'Ashok Leyland', logo: 'https://logo.clearbit.com/ashokleyland.com' },
-  { slug: 'mahindra', name: 'Mahindra', logo: 'https://logo.clearbit.com/mahindra.com' },
-  { slug: 'eicher', name: 'Eicher', logo: 'https://logo.clearbit.com/eicher.in' },
-  { slug: 'bharatbenz', name: 'BharatBenz', logo: 'https://logo.clearbit.com/daimler.com' },
-  { slug: 'force-motors', name: 'Force Motors', logo: 'https://logo.clearbit.com/forcemotors.com' }
+  { slug: 'tata-motors', name: 'Tata Motors', logo: 'https://cdn.simpleicons.org/tata' },
+  { slug: 'ashok-leyland', name: 'Ashok Leyland', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQi97BsPcFKCQvBV3Dv54G4EqXlKALg2XnSLJVH01N2w&s=10' },
+  { slug: 'mahindra', name: 'Mahindra', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPm379b0tDCoZX8mhj7UWwiQrolB0JAoy40cfPIwiYXQ&s=10' },
+  { slug: 'eicher', name: 'Eicher', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzAwuVW3gS-PpXO9Ro7eKPRxBYA3UiDvLFG9O7BPWERA&s=10' }
 ];
 
 const SellVehicle = () => {
@@ -258,17 +256,57 @@ const SellVehicle = () => {
                     </Button>
                   </form>
 
-                  <div className="grid grid-cols-3 gap-4 border-t border-slate-100 pt-6 mt-6 text-center">
-                    <div>
-                      <span className="text-xs font-bold text-text-muted block">1. Fetch</span>
+                  {/* Visual Step Progress Flow */}
+                  <div className="relative flex items-center justify-between w-full mt-8 border-t border-slate-100 pt-6">
+                    {/* Connecting Line background */}
+                    <div className="absolute top-[28px] left-[15%] right-[15%] h-1 bg-slate-200 z-0 rounded-full" />
+                    
+                    {/* Connecting Line filled progress */}
+                    <div 
+                      className="absolute top-[28px] left-[15%] h-1 bg-amber-500 z-0 rounded-full transition-all duration-500" 
+                      style={{ 
+                        width: lookupDone ? '70%' : loadingLookup ? '35%' : '0%' 
+                      }}
+                    />
+
+                    {/* Step 1: Fetch */}
+                    <div className="relative z-10 flex flex-col items-center flex-1">
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all ${
+                        lookupDone || loadingLookup 
+                          ? 'bg-amber-500 border-amber-500 text-white shadow-soft' 
+                          : 'bg-white border-amber-500 text-amber-600 shadow-md ring-4 ring-amber-100'
+                      }`}>
+                        1
+                      </div>
+                      <span className="text-xs font-bold text-text mt-2 block">1. Fetch</span>
                       <span className="text-[10px] text-text-muted">Direct RTO match</span>
                     </div>
-                    <div>
-                      <span className="text-xs font-bold text-text-muted block">2. Verify</span>
+
+                    {/* Step 2: Verify */}
+                    <div className="relative z-10 flex flex-col items-center flex-1">
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all ${
+                        lookupDone 
+                          ? 'bg-amber-500 border-amber-500 text-white shadow-soft' 
+                          : loadingLookup 
+                            ? 'bg-white border-amber-500 text-amber-600 shadow-md ring-4 ring-amber-100' 
+                            : 'bg-slate-100 border-slate-200 text-slate-400'
+                      }`}>
+                        2
+                      </div>
+                      <span className={`text-xs font-bold mt-2 block ${loadingLookup || lookupDone ? 'text-text' : 'text-slate-400'}`}>2. Verify</span>
                       <span className="text-[10px] text-text-muted">Validate specs</span>
                     </div>
-                    <div>
-                      <span className="text-xs font-bold text-text-muted block">3. Live</span>
+
+                    {/* Step 3: Live */}
+                    <div className="relative z-10 flex flex-col items-center flex-1">
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all ${
+                        lookupDone 
+                          ? 'bg-white border-amber-500 text-amber-600 shadow-md ring-4 ring-amber-100' 
+                          : 'bg-slate-100 border-slate-200 text-slate-400'
+                      }`}>
+                        3
+                      </div>
+                      <span className={`text-xs font-bold mt-2 block ${lookupDone ? 'text-text' : 'text-slate-400'}`}>3. Live</span>
                       <span className="text-[10px] text-text-muted">Publish instant listing</span>
                     </div>
                   </div>

@@ -43,7 +43,7 @@ const BrandsSection = () => {
 
         <motion.div
           variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
-          className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
+          className="flex flex-wrap justify-center gap-4"
         >
           {POPULAR_BRANDS.map((brand) => {
             const colours = BRAND_COLOURS[brand.name] || { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200' };
@@ -56,20 +56,20 @@ const BrandsSection = () => {
                 onClick={() => {
                   const CV_BRANDS = ['Tata Motors', 'Ashok Leyland', 'Mahindra', 'Eicher', 'BharatBenz', 'Force Motors', 'Piaggio'];
                   if (CV_BRANDS.includes(brand.name)) {
-                    navigate(`/buy/commercial?brand=${encodeURIComponent(brand.name)}`);
+                     navigate(`/buy/commercial?brand=${encodeURIComponent(brand.name)}`);
                   } else {
                     navigate(`/buy/cars?brand=${encodeURIComponent(brand.name)}`);
                   }
                 }}
-                className={`flex flex-col items-center gap-2.5 p-4 rounded-2xl border ${colours.bg} ${colours.border} hover:shadow-md transition-all cursor-pointer group`}
+                className={`w-[110px] sm:w-[130px] flex flex-col items-center gap-2.5 p-4 rounded-2xl border ${colours.bg} ${colours.border} hover:shadow-md transition-all cursor-pointer group`}
               >
-                {/* Brand initial avatar */}
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center font-black text-xl ${colours.text} bg-white shadow-sm border ${colours.border} group-hover:scale-110 transition-transform`}>
-                  {brand.name.charAt(0)}
-                </div>
-                <span className={`text-xs font-bold text-center leading-tight ${colours.text}`}>
-                  {brand.name}
-                </span>
+                {/* Brand logo image */}
+              <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-white shadow-sm border border-slate-100 group-hover:scale-110 transition-transform p-1.5 overflow-hidden">
+                <img src={brand.logo} alt={brand.name} className="h-full w-full object-contain" />
+              </div>
+              <span className="text-xs font-bold text-center leading-tight text-slate-800">
+                {brand.name}
+              </span>
               </motion.button>
             );
           })}

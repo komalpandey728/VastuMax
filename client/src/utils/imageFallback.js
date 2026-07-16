@@ -145,6 +145,109 @@ function hashStr(str) {
 }
 
 export function getFreeImage(brand = '', model = '', category = 'car', vehicleId = '') {
+  const brandLower = brand.toLowerCase().trim();
+  const modelLower = model.toLowerCase().trim();
+  const vehicleIdLower = (vehicleId || '').toLowerCase();
+
+  // Toyota Fortuner variant specific images
+  if (brandLower === 'toyota' && modelLower === 'fortuner') {
+    if (vehicleIdLower.includes('legender')) {
+      return '/src/assets/images/cars/toyota_fortuner_legender.png';
+    }
+    return '/src/assets/images/cars/toyota_fortuner_standard.png';
+  }
+
+  // Toyota Innova Crysta variant specific images
+  if (brandLower === 'toyota' && (modelLower === 'innova crysta' || modelLower === 'innova')) {
+    if (vehicleIdLower.includes('gx')) {
+      return '/src/assets/images/cars/toyota_innova_crysta_gx.png';
+    }
+    if (vehicleIdLower.includes('zx')) {
+      return '/src/assets/images/cars/toyota_innova_crysta_zx.png';
+    }
+  }
+
+
+  // Jeep Compass variant specific images
+  if (brandLower === 'jeep' && modelLower === 'compass') {
+    if (vehicleIdLower.includes('sport')) {
+      return '/src/assets/images/cars/jeep_compass_sport.png';
+    }
+  }
+
+  // Maruti Suzuki Swift variant specific images
+  if (brandLower === 'maruti suzuki' && modelLower === 'swift') {
+    return '/src/assets/images/cars/maruti_swift.png';
+  }
+
+  // Maruti Suzuki Alto variant specific images
+  if (brandLower === 'maruti suzuki' && modelLower === 'alto') {
+    if (vehicleIdLower.includes('lxi')) {
+      return '/src/assets/images/cars/maruti_alto_lxi.png';
+    }
+    if (vehicleIdLower.includes('vxi')) {
+      return '/src/assets/images/cars/maruti_alto_vxi.png';
+    }
+  }
+
+  // Honda City variant specific images
+  if (brandLower === 'honda' && modelLower === 'city') {
+    if (vehicleIdLower.includes('v_1.5l') || vehicleIdLower.includes('_v_')) {
+      return '/src/assets/images/cars/honda_city_v.png';
+    }
+  }
+
+  // Hyundai Creta variant specific images
+  if (brandLower === 'hyundai' && modelLower === 'creta') {
+    if (vehicleIdLower.includes('sx_o') || vehicleIdLower.includes('sxo')) {
+      return '/src/assets/images/cars/hyundai_creta_sxo.png';
+    }
+    return '/src/assets/images/cars/hyundai_creta_sx.png';
+  }
+
+  // Hyundai i20 variant specific images
+  if (brandLower === 'hyundai' && modelLower === 'i20') {
+    if (vehicleIdLower.includes('asta')) {
+      return '/src/assets/images/cars/hyundai_i20_asta.png';
+    }
+    if (vehicleIdLower.includes('magna')) {
+      return '/src/assets/images/cars/hyundai_i20_magna.png';
+    }
+  }
+
+  // Mahindra Thar variant specific images
+  if (brandLower === 'mahindra' && modelLower === 'thar') {
+    return '/src/assets/images/cars/mahindra_thar.png';
+  }
+
+  // Commercial Vehicles fallback images mapping
+  if (category === 'commercial') {
+    if (brandLower === 'swaraj' || modelLower.includes('744') || modelLower.includes('tractor')) {
+      return '/src/assets/images/cv/tractor.png';
+    }
+    if (brandLower === 'omega seiki' || modelLower.includes('m1ka')) {
+      return '/src/assets/images/cv/omega_seiki_m1ka.png';
+    }
+    if (brandLower === 'mahindra' && (modelLower.includes('zor') || modelLower.includes('ev') || modelLower.includes('grand'))) {
+      return '/src/assets/images/cv/mahindra_ev_truck.png';
+    }
+    if (brandLower === 'tata motors' || modelLower.includes('ace')) {
+      return '/src/assets/images/cv/tata_ace_gold.png';
+    }
+    if (brandLower === 'mahindra' || modelLower.includes('bolero')) {
+      return '/src/assets/images/cv/mahindra_bolero.png';
+    }
+    if (brandLower === 'ashok leyland' || modelLower.includes('dost')) {
+      return '/src/assets/images/cv/ashok_leyland_dost.png';
+    }
+    if (brandLower === 'eicher' || modelLower.includes('pro')) {
+      return '/src/assets/images/cv/eicher_pro.png';
+    }
+    if (brandLower === 'force motors' || modelLower.includes('traveller')) {
+      return '/src/assets/images/cv/force_traveller.png';
+    }
+  }
+
   const key = `${brand} ${model}`.toLowerCase().trim();
 
   // 1. Exact brand+model match

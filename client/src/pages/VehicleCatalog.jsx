@@ -42,7 +42,7 @@ const VehicleCatalog = () => {
   const sortBy = searchParams.get('sort') || 'newest';
   const lat = searchParams.get('lat') || '';
   const lng = searchParams.get('lng') || '';
-  const activeCategory = searchParams.get('category') || 'car';
+  const activeCategory = searchParams.get('category') || (searchVal ? 'all' : 'car');
 
   // Loading & Data
   const [loading, setLoading] = useState(true);
@@ -73,10 +73,10 @@ const VehicleCatalog = () => {
 
   // Comparison State
   const [comparedCars, setComparedCars] = useState([]);
-  const CAR_BRANDS = ['Maruti Suzuki', 'Hyundai', 'Tata Motors', 'Mahindra', 'Toyota', 'Kia', 'Honda', 'BMW', 'Tesla', 'Skoda', 'Jeep', 'MG'];
+  const CAR_BRANDS = ['Maruti Suzuki', 'Hyundai', 'Tata Motors', 'Mahindra', 'Toyota', 'Kia', 'Honda', 'BMW', 'Skoda', 'Jeep', 'MG'];
   const CV_BRANDS = ['Tata Motors', 'Ashok Leyland', 'Mahindra', 'Eicher', 'BharatBenz', 'Force Motors'];
   const filteredBrands = brands.filter((b) => {
-    const allowed = activeCategory === 'commercial' ? CV_BRANDS : CAR_BRANDS;
+    const allowed = activeCategory === 'commercial' ? CV_BRANDS : activeCategory === 'all' ? [...CAR_BRANDS, ...CV_BRANDS] : CAR_BRANDS;
     return allowed.includes(b.name);
   });
 
@@ -98,10 +98,11 @@ const VehicleCatalog = () => {
   const loadVehiclesData = useCallback(async () => {
     setLoading(true);
     try {
-      const filters = {};
+      const filters = { category: activeCategory };
       searchParams.forEach((value, key) => {
         filters[key] = value;
       });
+      filters.limit = 5;
 
       const res = await getVehicles(filters);
       // ensure each vehicle has at least one usable image (try to supply a free image)
@@ -363,13 +364,19 @@ const VehicleCatalog = () => {
                   <button
                     key={pill.label}
                     onClick={() => {
+                      const updated = new URLSearchParams(searchParams);
                       if (pill.filterKey) {
-                        updateParam(pill.filterKey, pill.filterVal);
+                        updated.set(pill.filterKey, pill.filterVal);
+                        updated.delete('bodyType');
                       } else if (pill.value) {
-                        updateParam('bodyType', pill.value);
+                        updated.set('bodyType', pill.value);
+                        updated.delete('fuel');
                       } else {
-                        handleClearFilters();
+                        updated.delete('bodyType');
+                        updated.delete('fuel');
                       }
+                      updated.set('page', '1');
+                      setSearchParams(updated);
                     }}
                     className={`flex items-center gap-1.5 border text-xs font-semibold px-3.5 py-2 rounded-full transition-all ${isActive
                         ? 'bg-primary-600 border-primary-600 text-white shadow-soft'
@@ -450,6 +457,64 @@ const VehicleCatalog = () => {
                 <Button size="sm" variant="outline" icon={MapPin} isLoading={gpsLoading} onClick={handleGPSProximity} className="w-full text-xs">
                   Find Cars Near Me
                 </Button>
+              )}
+            </Card>
+
+            {/* Cities locations Autocomplete search */}
+            <Card className="border border-border bg-white p-4 rounded-xl shadow-soft relative z-30">
+              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Showrooms City</h3>
+              <div className="relative mt-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
+                <input
+                  type="text"
+                  value={locationSearch}
+                  onChange={(e) => {
+                    setLocationSearch(e.target.value);
+                    setShowLocationSuggestions(true);
+                  }}
+                  onFocus={() => setShowLocationSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 200)}
+                  placeholder="Type RTO city name..."
+                  className="w-full rounded-xl border border-border bg-slate-50 py-2 pl-9 pr-4 text-xs font-semibold focus:bg-white focus:outline-none transition-all"
+                />
+                
+                {showLocationSuggestions && (
+                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-xl border border-border bg-white shadow-lg z-30">
+                    {cities.filter(c => !locationSearch || c.name.toLowerCase().startsWith(locationSearch.toLowerCase())).length === 0 ? (
+                      <div className="p-2.5 text-center text-text-muted text-[10px]">No cities match</div>
+                    ) : (
+                      cities
+                        .filter(c => !locationSearch || c.name.toLowerCase().startsWith(locationSearch.toLowerCase()))
+                        .map((city) => (
+                          <button
+                            key={city._id}
+                            type="button"
+                            onClick={() => handleCitySelect(city.name)}
+                            className="w-full text-left px-3.5 py-2 text-xs hover:bg-slate-50 transition-colors font-semibold text-text flex justify-between cursor-pointer"
+                          >
+                            <span>{city.name}</span>
+                            <span className="text-[10px] text-text-muted font-normal">{city.state}</span>
+                          </button>
+                        ))
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {cityVal && (
+                <div className="mt-2.5 flex items-center justify-between text-xs text-primary-700 bg-primary-50/70 px-2.5 py-1.5 rounded-xl border border-primary-100/50">
+                  <span className="font-semibold">Filtered by: {cityVal}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateParam('city', '');
+                      setLocationSearch('');
+                    }}
+                    className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                </div>
               )}
             </Card>
 
@@ -537,7 +602,7 @@ const VehicleCatalog = () => {
             <Card className="border border-border bg-white p-4 rounded-xl shadow-soft">
               <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Price Range</h3>
               <PriceSlider
-                min={0}
+                min={100000}
                 max={5000000}
                 initialMin={minPrice ? Number(minPrice) : undefined}
                 initialMax={maxPrice ? Number(maxPrice) : undefined}
@@ -578,7 +643,7 @@ const VehicleCatalog = () => {
             <Card className="border border-border bg-white p-4 rounded-xl shadow-soft">
               <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Fuel Type</h3>
               <div className="flex flex-col gap-2 text-xs">
-                {['Petrol', 'Diesel', 'Electric', 'Hybrid'].map((fuel) => (
+                {['Petrol', 'Petrol (E-20)', 'Diesel', 'Electric', 'Hybrid'].map((fuel) => (
                   <label key={fuel} className="flex items-center gap-2 font-medium cursor-pointer">
                     <input
                       type="radio"
@@ -598,84 +663,38 @@ const VehicleCatalog = () => {
               </div>
             </Card>
 
-            {/* Cities locations Autocomplete search */}
-            <Card className="border border-border bg-white p-4 rounded-xl shadow-soft">
-              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Showrooms City</h3>
-              <div className="relative mt-2">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
-                <input
-                  type="text"
-                  value={locationSearch}
-                  onChange={(e) => {
-                    setLocationSearch(e.target.value);
-                    setShowLocationSuggestions(true);
-                  }}
-                  onFocus={() => setShowLocationSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 200)}
-                  placeholder="Type RTO city name..."
-                  className="w-full rounded-xl border border-border bg-slate-50 py-2 pl-9 pr-4 text-xs font-semibold focus:bg-white focus:outline-none transition-all"
-                />
-                
-                {showLocationSuggestions && (
-                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-xl border border-border bg-white shadow-lg z-30">
-                    {cities.filter(c => !locationSearch || c.name.toLowerCase().startsWith(locationSearch.toLowerCase())).length === 0 ? (
-                      <div className="p-2.5 text-center text-text-muted text-[10px]">No cities match</div>
-                    ) : (
-                      cities
-                        .filter(c => !locationSearch || c.name.toLowerCase().startsWith(locationSearch.toLowerCase()))
-                        .map((city) => (
-                          <button
-                            key={city._id}
-                            type="button"
-                            onClick={() => handleCitySelect(city.name)}
-                            className="w-full text-left px-3.5 py-2 text-xs hover:bg-slate-50 transition-colors font-semibold text-text flex justify-between cursor-pointer"
-                          >
-                            <span>{city.name}</span>
-                            <span className="text-[10px] text-text-muted font-normal">{city.state}</span>
-                          </button>
-                        ))
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {cityVal && (
-                <div className="mt-2.5 flex items-center justify-between text-xs text-primary-700 bg-primary-50/70 px-2.5 py-1.5 rounded-xl border border-primary-100/50">
-                  <span className="font-semibold">Filtered by: {cityVal}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateParam('city', '');
-                      setLocationSearch('');
-                    }}
-                    className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
-                  >
-                    Clear
-                  </button>
-                </div>
-              )}
-            </Card>
-
             {/* Year filter */}
             <Card className="border border-border bg-white p-4 rounded-xl shadow-soft">
               <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Year of Manufacture</h3>
               <div className="flex flex-col gap-2 text-xs">
-                {[{ label: '2023 – 2025', min: '2023' }, { label: '2021 – 2022', min: '2021', max: '2022' }, { label: '2020 & Newer', min: '2020' }].map((yr) => (
-                  <button
-                    key={yr.label}
-                    onClick={() => {
-                      updateParam('minYear', yr.min);
-                      if (yr.max) updateParam('maxYear', yr.max);
-                    }}
-                    className={`text-left font-semibold px-3 py-2 rounded-lg border transition-all ${searchParams.get('minYear') === yr.min
-                        ? 'bg-primary-50 border-primary-200 text-primary-700'
-                        : 'bg-white border-border text-text hover:bg-slate-50'
+                {[
+                  { label: '2023 – 2025', min: '2023' },
+                  { label: '2021 – 2022', min: '2021', max: '2022' },
+                  { label: '2020 & Older', max: '2020' }
+                ].map((yr) => {
+                  const isActive = yr.min && yr.max 
+                    ? (searchParams.get('minYear') === yr.min && searchParams.get('maxYear') === yr.max)
+                    : yr.min 
+                      ? (searchParams.get('minYear') === yr.min && !searchParams.get('maxYear'))
+                      : (searchParams.get('maxYear') === yr.max && !searchParams.get('minYear'));
+                  return (
+                    <button
+                      key={yr.label}
+                      onClick={() => {
+                        updateParam('minYear', yr.min || '');
+                        updateParam('maxYear', yr.max || '');
+                      }}
+                      className={`text-left font-semibold px-3 py-2 rounded-lg border transition-all ${
+                        isActive
+                          ? 'bg-primary-50 border-primary-200 text-primary-700'
+                          : 'bg-white border-border text-text hover:bg-slate-50'
                       }`}
-                  >
-                    {yr.label}
-                  </button>
-                ))}
-                {searchParams.get('minYear') && (
+                    >
+                      {yr.label}
+                    </button>
+                  );
+                })}
+                {(searchParams.get('minYear') || searchParams.get('maxYear')) && (
                   <button onClick={() => { updateParam('minYear', ''); updateParam('maxYear', ''); }} className="text-[10px] text-red-500 hover:underline self-start">Clear Year</button>
                 )}
               </div>
@@ -685,7 +704,7 @@ const VehicleCatalog = () => {
             <Card className="border border-border bg-white p-4 rounded-xl shadow-soft">
               <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Ownership</h3>
               <div className="flex flex-col gap-2 text-xs">
-                {['1st Owner', '2nd Owner', '3rd Owner'].map((own) => (
+                {['1st Owner', '2nd Owner', '3rd Owner or more'].map((own) => (
                   <label key={own} className="flex items-center gap-2 font-medium cursor-pointer">
                     <input
                       type="radio"

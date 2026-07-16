@@ -22,7 +22,7 @@ const CustomerJourney = () => {
           <p className="mt-2 text-text-muted">From search to steering wheel — we&apos;ve got every step covered</p>
         </div>
 
-        <div ref={ref} className="relative mx-auto flex h-80 w-80 items-center justify-center sm:h-96 sm:w-96">
+        <div ref={ref} className="relative mx-auto w-[320px] h-[320px] sm:w-[384px] sm:h-[384px] flex items-center justify-center shrink-0">
           {/* Rotating ring */}
           <motion.svg
             viewBox="0 0 200 200"
@@ -64,22 +64,33 @@ const CustomerJourney = () => {
           {/* Step nodes */}
           {steps.map((step, i) => {
             const rad = (step.angle * Math.PI) / 180;
-            const x = 50 + 42 * Math.cos(rad);
-            const y = 50 + 42 * Math.sin(rad);
+            const x = 50 + 45 * Math.cos(rad);
+            const y = 50 + 45 * Math.sin(rad);
             return (
-              <motion.div
+              <div
                 key={step.label}
                 className="absolute flex flex-col items-center"
-                style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={inView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ delay: 0.3 + i * 0.15, type: 'spring' }}
+                style={{ 
+                  left: `${x}%`, 
+                  top: `${y}%`, 
+                  transform: 'translate(-50%, -50%)',
+                  width: '90px'
+                }}
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-primary-200 shadow-md text-primary-600">
-                  <step.icon className="h-5 w-5" />
-                </div>
-                <span className="mt-1 text-[10px] font-bold text-text-muted whitespace-nowrap">{step.label}</span>
-              </motion.div>
+                <motion.div
+                  className="flex flex-col items-center w-full"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={inView ? { opacity: 1, scale: 1 } : {}}
+                  transition={{ delay: 0.3 + i * 0.15, type: 'spring' }}
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-primary-200 shadow-md text-primary-600 z-10 hover:border-primary-400 hover:scale-105 transition-all cursor-pointer">
+                    <step.icon className="h-5 w-5" />
+                  </div>
+                  <span className="absolute top-13 text-[10px] font-black text-text bg-white/90 border border-slate-100 px-2 py-0.5 rounded-xl shadow-soft whitespace-nowrap text-center">
+                    {step.label}
+                  </span>
+                </motion.div>
+              </div>
             );
           })}
         </div>

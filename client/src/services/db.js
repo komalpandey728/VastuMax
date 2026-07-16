@@ -73,8 +73,8 @@ export const saveLocalData = (key, data) => {
 
 // --- DATA SEEDING ---
 export const seedBrowserDB = () => {
-  const SEED_VERSION_KEY = 'vastu_seeded_v9';
-  const PREVIOUS_SEED_KEYS = ['vastu_seeded_v8', 'vastu_seeded_v7', 'vastu_seeded_v6', 'vastu_seeded_v5', 'vastu_seeded_v4', 'vastu_seeded_v3', 'vastu_seeded_v2', 'vastu_seeded_v1'];
+  const SEED_VERSION_KEY = 'vastu_seeded_v15';
+  const PREVIOUS_SEED_KEYS = ['vastu_seeded_v14', 'vastu_seeded_v13', 'vastu_seeded_v12', 'vastu_seeded_v11', 'vastu_seeded_v10', 'vastu_seeded_v9', 'vastu_seeded_v8', 'vastu_seeded_v7', 'vastu_seeded_v6', 'vastu_seeded_v5', 'vastu_seeded_v4', 'vastu_seeded_v3', 'vastu_seeded_v2', 'vastu_seeded_v1'];
   const DATA_KEYS = [
     'vastu_users',
     'vastu_vendor_profiles',
@@ -220,7 +220,8 @@ export const seedBrowserDB = () => {
   saveLocalData('vastu_users', users);
 
   // 3. Seed Vehicles (35 items, including same-model and normal everyday Indian cars)
-  const getCuratedImages = (brand, model, category, index) => {
+  const getCuratedImages = (brand, model, category, index, variant = '') => {
+    const variantLower = (variant || '').toLowerCase();
     const hatchbacks = [
       'https://images.unsplash.com/photo-1619767886558-efdc259cde1a',
       'https://images.unsplash.com/photo-1583121274602-3e2820c69888',
@@ -271,58 +272,102 @@ export const seedBrowserDB = () => {
       list = luxury;
     }
 
-    return Array.from({ length: 5 }, (_, idx) => {
+    const baseImages = Array.from({ length: 5 }, (_, idx) => {
       const base = list[(index + idx) % list.length];
       return `${base}?w=800&auto=format&fit=crop&q=80&sig=${index}-${idx}`;
     });
+
+    if ((category || '').toLowerCase() === 'commercial') {
+      const brandLower = brand.toLowerCase();
+      if (modelLower.includes('tractor') || brandLower.includes('swaraj')) {
+        baseImages[0] = '/src/assets/images/cv/tractor.png';
+      } else if (brandLower.includes('omega') || modelLower.includes('m1ka')) {
+        baseImages[0] = '/src/assets/images/cv/omega_seiki_m1ka.png';
+      } else if (brandLower === 'mahindra' && variantLower.includes('delivery')) {
+        baseImages[0] = '/src/assets/images/cv/mahindra_ev_truck.png';
+      } else if (brandLower === 'tata motors' || modelLower.includes('ace')) {
+        baseImages[0] = '/src/assets/images/cv/tata_ace_gold.png';
+      } else if (brandLower === 'mahindra' || modelLower.includes('bolero')) {
+        baseImages[0] = '/src/assets/images/cv/mahindra_bolero.png';
+      } else if (brandLower === 'ashok leyland' || modelLower.includes('dost')) {
+        baseImages[0] = '/src/assets/images/cv/ashok_leyland_dost.png';
+      } else if (brandLower === 'eicher' || modelLower.includes('pro')) {
+        baseImages[0] = '/src/assets/images/cv/eicher_pro.png';
+      } else if (brandLower === 'force motors' || modelLower.includes('traveller')) {
+        baseImages[0] = '/src/assets/images/cv/force_traveller.png';
+      }
+      return baseImages;
+    }
+
+
+    if (brand === 'Toyota' && modelLower === 'fortuner') {
+      if (variantLower.includes('legender')) {
+        baseImages[0] = '/src/assets/images/cars/toyota_fortuner_legender.png';
+      } else {
+        baseImages[0] = '/src/assets/images/cars/toyota_fortuner_standard.png';
+      }
+    } else if (brand === 'Toyota' && modelLower === 'innova crysta') {
+      if (variantLower.includes('gx')) {
+        baseImages[0] = '/src/assets/images/cars/toyota_innova_crysta_gx.png';
+      } else if (variantLower.includes('zx')) {
+        baseImages[0] = '/src/assets/images/cars/toyota_innova_crysta_zx.png';
+      }
+    } else if (brand === 'Honda' && modelLower === 'city') {
+      if (variantLower.includes('v 1.5l')) {
+        baseImages[0] = '/src/assets/images/cars/honda_city_v.png';
+      }
+    } else if (brand === 'Jeep' && modelLower === 'compass') {
+      if (variantLower.includes('sport')) {
+        baseImages[0] = '/src/assets/images/cars/jeep_compass_sport.png';
+      }
+    } else if (brand === 'Maruti Suzuki' && modelLower === 'swift') {
+      baseImages[0] = '/src/assets/images/cars/maruti_swift.png';
+    } else if (brand === 'Hyundai' && modelLower === 'creta') {
+      if (variantLower.includes('sx(o)')) {
+        baseImages[0] = '/src/assets/images/cars/hyundai_creta_sxo.png';
+      } else {
+        baseImages[0] = '/src/assets/images/cars/hyundai_creta_sx.png';
+      }
+    } else if (brand === 'Hyundai' && modelLower === 'i20') {
+      if (variantLower.includes('asta')) {
+        baseImages[0] = '/src/assets/images/cars/hyundai_i20_asta.png';
+      } else if (variantLower.includes('magna')) {
+        baseImages[0] = '/src/assets/images/cars/hyundai_i20_magna.png';
+      }
+    } else if (brand === 'Mahindra' && modelLower === 'thar') {
+      if (variantLower.includes('mt')) {
+        baseImages[0] = '/src/assets/images/cars/mahindra_thar_mt.png';
+      } else {
+        baseImages[0] = '/src/assets/images/cars/mahindra_thar_at.png';
+      }
+    }
+
+    return baseImages;
   };
 
   const baseCars = [
-    { name: 'Swift VXI', brand: 'Maruti Suzuki', model: 'Swift', variant: 'VXI 1.2L Petrol MT', year: 2022, price: 650000, fuel: 'Petrol', transmission: 'Manual', engine: '1197 cc', power: '89 bhp', torque: '113 Nm', mileage: 22.3, ownership: 'First Owner', bodyType: 'Hatchback', city: 'Pune', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Swift ZXI+', brand: 'Maruti Suzuki', model: 'Swift', variant: 'ZXI+ 1.2L Petrol AMT', year: 2023, price: 780000, fuel: 'Petrol', transmission: 'Automatic', engine: '1197 cc', power: '89 bhp', torque: '113 Nm', mileage: 22.5, ownership: 'First Owner', bodyType: 'Hatchback', city: 'Pune', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Alto LXI', brand: 'Maruti Suzuki', model: 'Alto', variant: 'LXI CNG MT', year: 2021, price: 390000, fuel: 'CNG', transmission: 'Manual', engine: '796 cc', power: '47 bhp', torque: '60 Nm', mileage: 31.5, ownership: 'Second Owner', bodyType: 'Hatchback', city: 'Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'Alto VXI', brand: 'Maruti Suzuki', model: 'Alto', variant: 'VXI Petrol MT', year: 2022, price: 440000, fuel: 'Petrol', transmission: 'Manual', engine: '796 cc', power: '47 bhp', torque: '69 Nm', mileage: 22.0, ownership: 'First Owner', bodyType: 'Hatchback', city: 'Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'Creta SX', brand: 'Hyundai', model: 'Creta', variant: 'SX 1.5L Diesel MT', year: 2022, price: 1650000, fuel: 'Diesel', transmission: 'Manual', engine: '1493 cc', power: '113 bhp', torque: '250 Nm', mileage: 18.0, ownership: 'First Owner', bodyType: 'SUV', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'Creta SX(O)', brand: 'Hyundai', model: 'Creta', variant: 'SX(O) Turbo Petrol DCT', year: 2023, price: 1890000, fuel: 'Petrol', transmission: 'Automatic', engine: '1397 cc', power: '138 bhp', torque: '242 Nm', mileage: 16.8, ownership: 'First Owner', bodyType: 'SUV', city: 'Pune', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'i20 Magna', brand: 'Hyundai', model: 'i20', variant: 'Magna 1.2L Petrol MT', year: 2021, price: 680000, fuel: 'Petrol', transmission: 'Manual', engine: '1197 cc', power: '82 bhp', torque: '115 Nm', mileage: 20.3, ownership: 'First Owner', bodyType: 'Hatchback', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'i20 Asta', brand: 'Hyundai', model: 'i20', variant: 'Asta 1.2L Petrol IVT', year: 2022, price: 890000, fuel: 'Petrol', transmission: 'Automatic', engine: '1197 cc', power: '82 bhp', torque: '115 Nm', mileage: 19.6, ownership: 'First Owner', bodyType: 'Hatchback', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'Thar LX MT', brand: 'Mahindra', model: 'Thar', variant: 'LX 4x4 Diesel MT', year: 2022, price: 1420000, fuel: 'Diesel', transmission: 'Manual', engine: '2184 cc', power: '130 bhp', torque: '300 Nm', mileage: 15.2, ownership: 'First Owner', bodyType: 'SUV', city: 'Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'Thar LX AT', brand: 'Mahindra', model: 'Thar', variant: 'LX 4x4 Petrol AT', year: 2023, price: 1580000, fuel: 'Petrol', transmission: 'Automatic', engine: '1997 cc', power: '150 bhp', torque: '320 Nm', mileage: 12.4, ownership: 'First Owner', bodyType: 'SUV', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'XUV700 AX5', brand: 'Mahindra', model: 'XUV700', variant: 'AX5 Diesel MT 5Str', year: 2022, price: 1720000, fuel: 'Diesel', transmission: 'Manual', engine: '2198 cc', power: '182 bhp', torque: '420 Nm', mileage: 16.2, ownership: 'First Owner', bodyType: 'SUV', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'XUV700 AX7L', brand: 'Mahindra', model: 'XUV700', variant: 'AX7L Diesel AT 7Str', year: 2023, price: 2280000, fuel: 'Diesel', transmission: 'Automatic', engine: '2198 cc', power: '182 bhp', torque: '450 Nm', mileage: 15.5, ownership: 'First Owner', bodyType: 'SUV', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Fortuner Standard', brand: 'Toyota', model: 'Fortuner', variant: '2.8L 4x2 Diesel AT', year: 2021, price: 3450000, fuel: 'Diesel', transmission: 'Automatic', engine: '2755 cc', power: '201 bhp', torque: '500 Nm', mileage: 14.4, ownership: 'First Owner', bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
-    { name: 'Fortuner Legender', brand: 'Toyota', model: 'Fortuner', variant: 'Legender 4x4 Diesel AT', year: 2023, price: 4290000, fuel: 'Diesel', transmission: 'Automatic', engine: '2755 cc', power: '201 bhp', torque: '500 Nm', mileage: 14.2, ownership: 'First Owner', bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
-    { name: 'Innova Crysta GX', brand: 'Toyota', model: 'Innova Crysta', variant: 'GX 2.4L Diesel MT', year: 2022, price: 1980000, fuel: 'Diesel', transmission: 'Manual', engine: '2393 cc', power: '148 bhp', torque: '343 Nm', mileage: 13.5, ownership: 'First Owner', bodyType: 'MPV', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'Innova Crysta ZX', brand: 'Toyota', model: 'Innova Crysta', variant: 'ZX 2.4L Diesel AT', year: 2023, price: 2450000, fuel: 'Diesel', transmission: 'Automatic', engine: '2393 cc', power: '148 bhp', torque: '360 Nm', mileage: 13.0, ownership: 'First Owner', bodyType: 'MPV', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'City V', brand: 'Honda', model: 'City', variant: 'V 1.5L Petrol MT', year: 2021, price: 1120000, fuel: 'Petrol', transmission: 'Manual', engine: '1498 cc', power: '119 bhp', torque: '145 Nm', mileage: 17.8, ownership: 'First Owner', bodyType: 'Sedan', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'City ZX', brand: 'Honda', model: 'City', variant: 'ZX 1.5L Petrol CVT', year: 2023, price: 1460000, fuel: 'Petrol', transmission: 'Automatic', engine: '1498 cc', power: '119 bhp', torque: '145 Nm', mileage: 18.4, ownership: 'First Owner', bodyType: 'Sedan', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'Nexon EV Prime', brand: 'Tata Motors', model: 'Nexon EV', variant: 'Prime XM 30.2kWh', year: 2022, price: 1450000, fuel: 'Electric', transmission: 'Automatic', engine: 'Permanent Magnet Motor', power: '127 bhp', torque: '245 Nm', mileage: 312, ownership: 'First Owner', bodyType: 'SUV', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Nexon EV Max', brand: 'Tata Motors', model: 'Nexon EV', variant: 'Max XZ+ Lux 40.5kWh', year: 2023, price: 1850000, fuel: 'Electric', transmission: 'Automatic', engine: 'Permanent Magnet Motor', power: '141 bhp', torque: '250 Nm', mileage: 437, ownership: 'First Owner', bodyType: 'SUV', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Punch Adventure', brand: 'Tata Motors', model: 'Punch', variant: 'Adventure 1.2L Petrol MT', year: 2022, price: 690000, fuel: 'Petrol', transmission: 'Manual', engine: '1199 cc', power: '84 bhp', torque: '113 Nm', mileage: 18.9, ownership: 'First Owner', bodyType: 'SUV', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'Punch Creative', brand: 'Tata Motors', model: 'Punch', variant: 'Creative 1.2L Petrol AMT', year: 2023, price: 850000, fuel: 'Petrol', transmission: 'Automatic', engine: '1199 cc', power: '84 bhp', torque: '113 Nm', mileage: 18.8, ownership: 'First Owner', bodyType: 'SUV', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'Harrier XT', brand: 'Tata Motors', model: 'Harrier', variant: 'XT 2.0L Diesel MT', year: 2021, price: 1540000, fuel: 'Diesel', transmission: 'Manual', engine: '1956 cc', power: '168 bhp', torque: '350 Nm', mileage: 16.3, ownership: 'Second Owner', bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
-    { name: 'Harrier XZ+', brand: 'Tata Motors', model: 'Harrier', variant: 'XZ+ 2.0L Diesel AT', year: 2023, price: 2180000, fuel: 'Diesel', transmission: 'Automatic', engine: '1956 cc', power: '168 bhp', torque: '350 Nm', mileage: 14.6, ownership: 'First Owner', bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
-    { name: 'Seltos HTX', brand: 'Kia', model: 'Seltos', variant: 'HTX 1.5L Petrol MT', year: 2022, price: 1490000, fuel: 'Petrol', transmission: 'Manual', engine: '1497 cc', power: '113 bhp', torque: '144 Nm', mileage: 16.5, ownership: 'First Owner', bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
-    { name: 'Seltos GTX+', brand: 'Kia', model: 'Seltos', variant: 'GTX+ 1.5L Diesel AT', year: 2023, price: 1980000, fuel: 'Diesel', transmission: 'Automatic', engine: '1493 cc', power: '113 bhp', torque: '250 Nm', mileage: 18.0, ownership: 'First Owner', bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
-    { name: 'Slavia Active', brand: 'Skoda', model: 'Slavia', variant: 'Active 1.0L TSI MT', year: 2022, price: 1090000, fuel: 'Petrol', transmission: 'Manual', engine: '999 cc', power: '114 bhp', torque: '178 Nm', mileage: 19.4, ownership: 'First Owner', bodyType: 'Sedan', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Slavia Style', brand: 'Skoda', model: 'Slavia', variant: 'Style 1.5L TSI DSG', year: 2023, price: 1680000, fuel: 'Petrol', transmission: 'Automatic', engine: '1498 cc', power: '148 bhp', torque: '250 Nm', mileage: 18.4, ownership: 'First Owner', bodyType: 'Sedan', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'ZS EV Excite', brand: 'MG', model: 'ZS EV', variant: 'Excite 50.3kWh', year: 2022, price: 2190000, fuel: 'Electric', transmission: 'Automatic', engine: 'Electric Motor', power: '173 bhp', torque: '280 Nm', mileage: 461, ownership: 'First Owner', bodyType: 'SUV', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'ZS EV Exclusive', brand: 'MG', model: 'ZS EV', variant: 'Exclusive 50.3kWh', year: 2023, price: 2480000, fuel: 'Electric', transmission: 'Automatic', engine: 'Electric Motor', power: '173 bhp', torque: '280 Nm', mileage: 461, ownership: 'First Owner', bodyType: 'SUV', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'BMW M4 Standard', brand: 'BMW', model: 'M4 Coupe', variant: 'Standard 3.0L RWD MT', year: 2022, price: 7490000, fuel: 'Petrol', transmission: 'Manual', engine: '2993 cc', power: '473 bhp', torque: '550 Nm', mileage: 10.4, ownership: 'Second Owner', bodyType: 'Coupe', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'car' },
-    { name: 'BMW M4 Competition', brand: 'BMW', model: 'M4 Coupe', variant: 'xDrive Competition AT', year: 2023, price: 8900000, fuel: 'Petrol', transmission: 'Automatic', engine: '2993 cc', power: '503 bhp', torque: '650 Nm', mileage: 9.8, ownership: 'First Owner', bodyType: 'Coupe', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
-    { name: 'Tesla Model 3 Long Range', brand: 'Tesla', model: 'Model 3', variant: 'Long Range AWD', year: 2024, price: 4899000, fuel: 'Electric', transmission: 'Automatic', engine: 'Dual Motor AWD', power: '394 bhp', torque: '493 Nm', mileage: 629, ownership: 'First Owner', bodyType: 'Sedan', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Tesla Model 3 Performance', brand: 'Tesla', model: 'Model 3', variant: 'Performance AWD', year: 2024, price: 5499000, fuel: 'Electric', transmission: 'Automatic', engine: 'Dual Motor Performance', power: '510 bhp', torque: '741 Nm', mileage: 528, ownership: 'First Owner', bodyType: 'Sedan', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
-    { name: 'Compass Sport', brand: 'Jeep', model: 'Compass', variant: 'Sport 2.0L Diesel MT', year: 2022, price: 1890000, fuel: 'Diesel', transmission: 'Manual', engine: '1956 cc', power: '170 bhp', torque: '350 Nm', mileage: 17.1, ownership: 'First Owner', bodyType: 'SUV', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'car' },
+    { name: 'Swift ZXI+', brand: 'Maruti Suzuki', model: 'Swift', variant: 'ZXI+ 1.2L Petrol AMT', year: 2023, price: 780000, fuel: 'Petrol (E-20)', transmission: 'Automatic', engine: '1197 cc', power: '89 bhp', torque: '113 Nm', mileage: 22.5, ownership: 'First Owner', kmDriven: 18000, bodyType: 'Hatchback', city: 'Pune', coordinates: [73.8567, 18.5204], category: 'car' },
+    { name: 'Creta SX', brand: 'Hyundai', model: 'Creta', variant: 'SX 1.5L Diesel MT', year: 2022, price: 1650000, fuel: 'Diesel', transmission: 'Manual', engine: '1493 cc', power: '113 bhp', torque: '250 Nm', mileage: 18.0, ownership: 'First Owner', kmDriven: 24000, bodyType: 'SUV', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
+    { name: 'Creta SX(O)', brand: 'Hyundai', model: 'Creta', variant: 'SX(O) Turbo Petrol DCT', year: 2023, price: 1890000, fuel: 'Petrol (E-20)', transmission: 'Automatic', engine: '1397 cc', power: '138 bhp', torque: '242 Nm', mileage: 16.8, ownership: 'First Owner', kmDriven: 12000, bodyType: 'SUV', city: 'Pune', coordinates: [73.8567, 18.5204], category: 'car' },
+    { name: 'i20 Magna', brand: 'Hyundai', model: 'i20', variant: 'Magna 1.2L Petrol MT', year: 2021, price: 680000, fuel: 'Petrol', transmission: 'Manual', engine: '1197 cc', power: '82 bhp', torque: '115 Nm', mileage: 20.3, ownership: 'First Owner', kmDriven: 32000, bodyType: 'Hatchback', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
+    { name: 'i20 Asta', brand: 'Hyundai', model: 'i20', variant: 'Asta 1.2L Petrol IVT', year: 2022, price: 890000, fuel: 'Petrol', transmission: 'Automatic', engine: '1197 cc', power: '82 bhp', torque: '115 Nm', mileage: 19.6, ownership: 'First Owner', kmDriven: 15000, bodyType: 'Hatchback', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'car' },
+    { name: 'Thar LX MT', brand: 'Mahindra', model: 'Thar', variant: 'LX 4x4 Diesel MT', year: 2022, price: 1420000, fuel: 'Diesel', transmission: 'Manual', engine: '2184 cc', power: '130 bhp', torque: '300 Nm', mileage: 15.2, ownership: 'First Owner', kmDriven: 28000, bodyType: 'SUV', city: 'Delhi', coordinates: [77.209, 28.6139], category: 'car' },
+    { name: 'Thar LX AT', brand: 'Mahindra', model: 'Thar', variant: 'LX 4x4 Petrol AT', year: 2023, price: 1580000, fuel: 'Petrol', transmission: 'Automatic', engine: '1997 cc', power: '150 bhp', torque: '320 Nm', mileage: 12.4, ownership: 'First Owner', kmDriven: 9000, bodyType: 'SUV', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'car' },
+    { name: 'Fortuner Standard', brand: 'Toyota', model: 'Fortuner', variant: '2.8L 4x2 Diesel AT', year: 2021, price: 3450000, fuel: 'Diesel', transmission: 'Automatic', engine: '2755 cc', power: '201 bhp', torque: '500 Nm', mileage: 14.4, ownership: 'First Owner', kmDriven: 52000, bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
+    { name: 'Fortuner Legender', brand: 'Toyota', model: 'Fortuner', variant: 'Legender 4x4 Diesel AT', year: 2023, price: 4290000, fuel: 'Diesel', transmission: 'Automatic', engine: '2755 cc', power: '201 bhp', torque: '500 Nm', mileage: 14.2, ownership: 'First Owner', kmDriven: 16000, bodyType: 'SUV', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'car' },
     // Commercial Vehicles (CVs)
-    { name: 'Tata Ace Gold', brand: 'Tata Motors', model: 'Ace Gold', variant: 'Diesel Plus Mini Truck', year: 2022, price: 475000, fuel: 'Diesel', transmission: 'Manual', engine: '702 cc', power: '20 bhp', torque: '45 Nm', mileage: 21.0, ownership: 'First Owner', bodyType: 'Mini Truck', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'commercial', specifications: { payloadCapacity: '750 kg', gvw: '1.6 Tons', numTyres: '4', bodyType: 'Open Body' } },
-    { name: 'Mahindra Bolero Pickup', brand: 'Mahindra', model: 'Bolero Pik-Up', variant: 'CBC 1.7T MS', year: 2023, price: 820000, fuel: 'Diesel', transmission: 'Manual', engine: '2523 cc', power: '75 bhp', torque: '200 Nm', mileage: 14.3, ownership: 'First Owner', bodyType: 'Pickup', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'commercial', specifications: { payloadCapacity: '1.7 Tons', gvw: '3.4 Tons', numTyres: '4', bodyType: 'High Deck' } },
-    { name: 'Ashok Leyland Dost+', brand: 'Ashok Leyland', model: 'Dost+', variant: 'LE Diesel', year: 2022, price: 690000, fuel: 'Diesel', transmission: 'Manual', engine: '1478 cc', power: '80 bhp', torque: '190 Nm', mileage: 17.6, ownership: 'First Owner', bodyType: 'Mini Truck', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'commercial', specifications: { payloadCapacity: '1.5 Tons', gvw: '2.8 Tons', numTyres: '4', bodyType: 'Open Body' } },
-    { name: 'Eicher Pro 2049', brand: 'Eicher', model: 'Pro 2049', variant: 'CBC 10ft container', year: 2021, price: 1250000, fuel: 'Diesel', transmission: 'Manual', engine: '2000 cc', power: '100 bhp', torque: '285 Nm', mileage: 11.5, ownership: 'First Owner', bodyType: 'Truck', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'commercial', specifications: { payloadCapacity: '3.5 Tons', gvw: '4.9 Tons', numTyres: '6', bodyType: 'Closed Container' } },
-    { name: 'Force Traveller 3050', brand: 'Force Motors', model: 'Traveller 3050', variant: '12 Seater AC', year: 2022, price: 1480000, fuel: 'Diesel', transmission: 'Manual', engine: '2596 cc', power: '115 bhp', torque: '350 Nm', mileage: 13.0, ownership: 'First Owner', bodyType: 'Bus', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'commercial', specifications: { payloadCapacity: '2.5 Tons', gvw: '4.6 Tons', numTyres: '4', bodyType: 'Closed Container' } },
+    { name: 'Tata Ace Gold', brand: 'Tata Motors', model: 'Ace Gold', variant: 'Diesel Plus Mini Truck', year: 2022, price: 475000, fuel: 'Diesel', transmission: 'Manual', engine: '702 cc', power: '20 bhp', torque: '45 Nm', mileage: 21.0, ownership: 'First Owner', kmDriven: 41000, bodyType: 'Mini Truck', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'commercial', specifications: { payloadCapacity: '750 kg', gvw: '1.6 Tons', bodyType: 'Open Body' } },
+    { name: 'Mahindra Bolero Pickup', brand: 'Mahindra', model: 'Bolero Pik-Up', variant: 'CBC 1.7T MS', year: 2023, price: 490000, fuel: 'Diesel', transmission: 'Manual', engine: '2523 cc', power: '75 bhp', torque: '200 Nm', mileage: 14.3, ownership: 'First Owner', kmDriven: 29000, bodyType: 'Pickup', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'commercial', specifications: { payloadCapacity: '1.7 Tons', gvw: '3.4 Tons', bodyType: 'High Deck' } },
+    { name: 'Ashok Leyland Dost+', brand: 'Ashok Leyland', model: 'Dost+', variant: 'LE Diesel', year: 2022, price: 380000, fuel: 'Diesel', transmission: 'Manual', engine: '1478 cc', power: '80 bhp', torque: '190 Nm', mileage: 17.6, ownership: 'First Owner', kmDriven: 36000, bodyType: 'Mini Truck', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'commercial', specifications: { payloadCapacity: '1.5 Tons', gvw: '2.8 Tons', bodyType: 'Open Body' } },
+    { name: 'Eicher Pro 2049', brand: 'Eicher', model: 'Pro 2049', variant: 'CBC 10ft container', year: 2021, price: 450000, fuel: 'Diesel', transmission: 'Manual', engine: '2000 cc', power: '100 bhp', torque: '285 Nm', mileage: 11.5, ownership: 'First Owner', kmDriven: 65000, bodyType: 'Truck', city: 'New Delhi', coordinates: [77.209, 28.6139], category: 'commercial', specifications: { payloadCapacity: '3.5 Tons', gvw: '4.9 Tons', bodyType: 'Closed Container' } },
+    { name: 'Force Traveller 3050', brand: 'Force Motors', model: 'Traveller 3050', variant: '12 Seater AC', year: 2022, price: 420000, fuel: 'Diesel', transmission: 'Manual', engine: '2596 cc', power: '115 bhp', torque: '350 Nm', mileage: 13.0, ownership: 'First Owner', kmDriven: 54000, bodyType: 'Bus', city: 'Mumbai', coordinates: [73.8567, 18.5204], category: 'commercial', specifications: { payloadCapacity: '2.5 Tons', gvw: '4.6 Tons', bodyType: 'Closed Container' } },
+    { name: 'Swaraj 744 XT', brand: 'Swaraj', model: '744 XT', variant: 'XT 50 HP', year: 2023, price: 740000, fuel: 'Diesel', transmission: 'Manual', engine: '3478 cc', power: '50 bhp', torque: '200 Nm', mileage: 5.5, ownership: 'First Owner', kmDriven: 1200, bodyType: 'Tractor', city: 'Pune', coordinates: [73.8567, 18.5204], category: 'commercial', specifications: { payloadCapacity: '3.0 Tons (Towing)', gvw: '2.0 Tons', bodyType: 'Tractor' } },
+    { name: 'Omega Seiki M1KA 1.0', brand: 'Omega Seiki', model: 'M1KA 1.0', variant: 'M1KA 1.0 Electric', year: 2024, price: 699000, fuel: 'Electric', transmission: 'Automatic', engine: '15 kWh Electric Motor', power: '40 bhp', torque: '80 Nm', mileage: 120, ownership: 'First Owner', kmDriven: 8500, bodyType: 'Mini Truck', city: 'Mumbai', coordinates: [72.8777, 19.076], category: 'commercial', specifications: { payloadCapacity: '850 kg', gvw: '2.2 Tons', bodyType: 'Mini Truck' } },
+    { name: 'Mahindra Zor Grand', brand: 'Mahindra', model: 'Zor Grand', variant: 'Zor Grand Delivery Van', year: 2023, price: 310000, fuel: 'Electric', transmission: 'Automatic', engine: '10.24 kWh Lithium-ion', power: '16 bhp', torque: '50 Nm', mileage: 125, ownership: 'First Owner', kmDriven: 6200, bodyType: 'Pickup', city: 'Bengaluru', coordinates: [77.5946, 12.9716], category: 'commercial', specifications: { payloadCapacity: '505 kg', gvw: '1.0 Tons', bodyType: 'Pickup' } },
   ];
 
   const vehicles = baseCars.map((car, idx) => {
-    const uniqueImages = getCuratedImages(car.brand, car.model, car.category, idx);
+    const uniqueImages = getCuratedImages(car.brand, car.model, car.category, idx, car.variant);
 
     return {
       _id: `car_${car.brand.toLowerCase().replace(/\s+/g, '_')}_${car.model.toLowerCase().replace(/\s+/g, '_')}_${car.variant.toLowerCase().replace(/\s+/g, '_')}_${car.year}_${idx}`,
@@ -338,6 +383,7 @@ export const seedBrowserDB = () => {
       power: car.power,
       torque: car.torque,
       mileage: car.mileage,
+      kmDriven: car.kmDriven || 0,
       ownership: car.ownership,
       category: car.category || 'car',
       insurance: 'Comprehensive active',
@@ -349,7 +395,6 @@ export const seedBrowserDB = () => {
       specifications: car.category === 'commercial' ? {
         payloadCapacity: car.specifications.payloadCapacity,
         gvw: car.specifications.gvw,
-        numTyres: car.specifications.numTyres,
         bodyType: car.specifications.bodyType || car.bodyType,
         pros: ['Refined silent drive response', 'Excellent load carrying performance', 'Suspension is built very solid'],
         cons: ['Interior cabin utilities are basic', 'Engine noise is audible under heavy loads'],
@@ -367,10 +412,10 @@ export const seedBrowserDB = () => {
         cons: ['Infotainment screen responsiveness can improve', 'Suspension is on the firm side over broken tracks'],
         rating: 4.5,
       },
-      location: { 
-        city: car.city, 
-        state: car.city === 'New Delhi' ? 'Delhi' : car.city === 'Bengaluru' ? 'Karnataka' : 'Maharashtra', 
-        coordinates: car.coordinates 
+      location: {
+        city: car.city,
+        state: car.city === 'New Delhi' ? 'Delhi' : car.city === 'Bengaluru' ? 'Karnataka' : 'Maharashtra',
+        coordinates: car.coordinates
       },
       images: uniqueImages,
       threeSixtyImages: [],
@@ -387,16 +432,15 @@ export const seedBrowserDB = () => {
 
   // 4. Seed metadata tables
   const brands = [
-    { _id: 'b1', name: 'Maruti Suzuki', logo: 'https://logo.clearbit.com/marutisuzuki.com' },
-    { _id: 'b2', name: 'Hyundai', logo: 'https://logo.clearbit.com/hyundai.com' },
-    { _id: 'b3', name: 'Tata Motors', logo: 'https://logo.clearbit.com/tatamotors.com' },
-    { _id: 'b4', name: 'Mahindra', logo: 'https://logo.clearbit.com/mahindra.com' },
-    { _id: 'b5', name: 'Toyota', logo: 'https://logo.clearbit.com/toyota.com' },
-    { _id: 'b6', name: 'Kia', logo: 'https://logo.clearbit.com/kia.com' },
-    { _id: 'b7', name: 'BMW', logo: 'https://logo.clearbit.com/bmw.com' },
-    { _id: 'b8', name: 'Tesla', logo: 'https://logo.clearbit.com/tesla.com' },
-    { _id: 'b9', name: 'Ashok Leyland', logo: 'https://logo.clearbit.com/ashokleyland.com' },
-    { _id: 'b10', name: 'Eicher', logo: 'https://logo.clearbit.com/eicher.in' },
+    { _id: 'b1', name: 'Maruti Suzuki', logo: 'https://cdn.simpleicons.org/suzuki' },
+    { _id: 'b2', name: 'Hyundai', logo: 'https://cdn.simpleicons.org/hyundai' },
+    { _id: 'b3', name: 'Tata Motors', logo: 'https://cdn.simpleicons.org/tata' },
+    { _id: 'b4', name: 'Mahindra', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Mahindra_Rise_Logo.svg' },
+    { _id: 'b5', name: 'Toyota', logo: 'https://cdn.simpleicons.org/toyota' },
+    { _id: 'b6', name: 'Kia', logo: 'https://cdn.simpleicons.org/kia' },
+    { _id: 'b7', name: 'Honda', logo: 'https://cdn.simpleicons.org/honda' },
+    { _id: 'b9', name: 'Ashok Leyland', logo: 'https://upload.wikimedia.org/wikipedia/en/8/8d/Ashok_Leyland_logo.svg' },
+    { _id: 'b10', name: 'Eicher', logo: 'https://upload.wikimedia.org/wikipedia/en/0/03/Eicher_Motors_logo.svg' },
     { _id: 'b11', name: 'Force Motors', logo: 'https://logo.clearbit.com/forcemotors.com' },
   ];
   saveLocalData('vastu_brands', brands);

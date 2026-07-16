@@ -149,14 +149,24 @@ export const getVehicles = async (filters = {}) => {
 
     // Text search
     if (filters.search) {
-      const regex = new RegExp(filters.search, 'i');
-      list = list.filter(
+      const q = filters.search.toLowerCase();
+      let matched = list.filter(
         (v) =>
-          regex.test(v.name) ||
-          regex.test(v.brand) ||
-          regex.test(v.model) ||
-          regex.test(v.description)
+          v.name.toLowerCase().startsWith(q) ||
+          v.brand.toLowerCase().startsWith(q) ||
+          v.model.toLowerCase().startsWith(q)
       );
+      if (matched.length === 0) {
+        const regex = new RegExp(filters.search, 'i');
+        matched = list.filter(
+          (v) =>
+            regex.test(v.name) ||
+            regex.test(v.brand) ||
+            regex.test(v.model) ||
+            regex.test(v.description)
+        );
+      }
+      list = matched;
     }
 
     // Exact matches
@@ -164,13 +174,30 @@ export const getVehicles = async (filters = {}) => {
     if (filters.model) list = list.filter((v) => v.model === filters.model);
     if (filters.fuel) list = list.filter((v) => v.fuel === filters.fuel);
     if (filters.transmission) list = list.filter((v) => v.transmission === filters.transmission);
-    if (filters.ownership) list = list.filter((v) => v.ownership === filters.ownership);
+    if (filters.ownership) {
+      const ownMap = {
+        '1st Owner': 'First Owner',
+        '2nd Owner': 'Second Owner',
+        '3rd Owner': 'Third Owner',
+        '3rd Owner or more': ['Third Owner', 'Fourth Owner+']
+      };
+      const targetVal = ownMap[filters.ownership];
+      if (Array.isArray(targetVal)) {
+        list = list.filter((v) => targetVal.includes(v.ownership));
+      } else if (targetVal) {
+        list = list.filter((v) => v.ownership === targetVal);
+      }
+    }
     if (filters.city) {
       const regex = new RegExp(filters.city, 'i');
       list = list.filter((v) => regex.test(v.location?.city));
     }
     if (filters.bodyType) {
-      list = list.filter((v) => v.specifications?.bodyType === filters.bodyType);
+      const target = filters.bodyType.toLowerCase().replace(/[^a-z0-9]/g, '');
+      list = list.filter((v) => {
+        const vType = (v.bodyType || v.specifications?.bodyType || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        return vType.includes(target) || target.includes(vType);
+      });
     }
 
     if (filters.category) {

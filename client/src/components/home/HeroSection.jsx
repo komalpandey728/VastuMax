@@ -5,6 +5,8 @@ import { Search, MapPin, Car, Truck, ArrowRight, ShieldCheck, Star, Zap } from '
 import { POPULAR_BRANDS } from '../../constants';
 import { buildVehicleSearchParams } from '../../utils/searchParams';
 
+import heroBg from '../../assets/images/hero/hero_bg.png';
+
 const INDIAN_LOCATIONS = [
   "Mumbai, Maharashtra",
   "Pune, Maharashtra",
@@ -85,7 +87,7 @@ const HeroSection = () => {
       {/* Background image with dark overlay */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1920&h=1080&fit=crop&q=80"
+          src={heroBg}
           alt="Hero car"
           className="h-full w-full object-cover"
         />

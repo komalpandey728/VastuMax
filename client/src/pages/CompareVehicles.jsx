@@ -177,26 +177,47 @@ const CompareVehicles = () => {
     );
   }
 
+  const isCommercial = vehicles.length > 0 && vehicles[0].category === 'commercial';
+
   // Specifications rows configuration
-  const specRows = [
-    { label: 'Ex-Showroom Price', key: 'price', format: (val) => `₹${(val || 0).toLocaleString('en-IN')}` },
-    { label: 'Model Year', key: 'year' },
-    { label: 'Fuel Type', key: 'fuel' },
-    { label: 'Transmission', key: 'transmission' },
-    { label: 'Ownership', key: 'ownership' },
-    { label: 'KM Driven', key: 'kmDriven', format: (val) => val ? `${val.toLocaleString('en-IN')} km` : 'N/A' },
-    { label: 'Engine Capacity', key: 'engine' },
-    { label: 'Max Power Output', key: 'power' },
-    { label: 'Max Torque Output', key: 'torque' },
-    { label: 'Mileage / Range', key: 'mileage', format: (val, item) => val ? `${val} ${item.fuel === 'Electric' ? 'km' : 'kmpl'}` : 'N/A' },
-    { label: 'Boot Space', key: 'bootSpace', isNested: true },
-    { label: 'Ground Clearance', key: 'groundClearance', isNested: true },
-    { label: 'Top Speed', key: 'topSpeed', isNested: true },
-    { label: '0-100 km/h Sprint', key: 'zeroToHundred', isNested: true },
-    { label: 'Safety Rating', key: 'safetyRating', isNested: true },
-    { label: 'Dealer Warranty', key: 'warranty', isNested: true },
-    { label: 'Exterior Color', key: 'color', isNested: true },
-  ];
+  const specRows = isCommercial
+    ? [
+        { label: 'Ex-Showroom Price', key: 'price', format: (val) => `₹${(val || 0).toLocaleString('en-IN')}` },
+        { label: 'Model Year', key: 'year' },
+        { label: 'Fuel Type', key: 'fuel' },
+        { label: 'Transmission', key: 'transmission' },
+        { label: 'Ownership', key: 'ownership' },
+        { label: 'KM Driven', key: 'kmDriven', format: (val) => val ? `${val.toLocaleString('en-IN')} km` : 'N/A' },
+        { label: 'Engine Capacity', key: 'engine' },
+        { label: 'Max Power Output', key: 'power' },
+        { label: 'Max Torque Output', key: 'torque' },
+        { label: 'Mileage / Range', key: 'mileage', format: (val, item) => val ? `${val} ${item.fuel === 'Electric' ? 'km' : 'kmpl'}` : 'N/A' },
+        { label: 'Payload Capacity', key: 'payloadCapacity', isNested: true },
+        { label: 'Gross Vehicle Weight (GVW)', key: 'gvw', isNested: true },
+        { label: 'Permit Type', key: 'permitType', isNested: true },
+        { label: 'Fitness Certificate', key: 'fitnessStatus', isNested: true },
+        { label: 'Body Type', key: 'bodyType', isNested: true },
+        { label: 'Exterior Color', key: 'color', isNested: true },
+      ]
+    : [
+        { label: 'Ex-Showroom Price', key: 'price', format: (val) => `₹${(val || 0).toLocaleString('en-IN')}` },
+        { label: 'Model Year', key: 'year' },
+        { label: 'Fuel Type', key: 'fuel' },
+        { label: 'Transmission', key: 'transmission' },
+        { label: 'Ownership', key: 'ownership' },
+        { label: 'KM Driven', key: 'kmDriven', format: (val) => val ? `${val.toLocaleString('en-IN')} km` : 'N/A' },
+        { label: 'Engine Capacity', key: 'engine' },
+        { label: 'Max Power Output', key: 'power' },
+        { label: 'Max Torque Output', key: 'torque' },
+        { label: 'Mileage / Range', key: 'mileage', format: (val, item) => val ? `${val} ${item.fuel === 'Electric' ? 'km' : 'kmpl'}` : 'N/A' },
+        { label: 'Boot Space', key: 'bootSpace', isNested: true },
+        { label: 'Ground Clearance', key: 'groundClearance', isNested: true },
+        { label: 'Top Speed', key: 'topSpeed', isNested: true },
+        { label: '0-100 km/h Sprint', key: 'zeroToHundred', isNested: true },
+        { label: 'Safety Rating', key: 'safetyRating', isNested: true },
+        { label: 'Dealer Warranty', key: 'warranty', isNested: true },
+        { label: 'Exterior Color', key: 'color', isNested: true },
+      ];
 
   return (
     <div className="container-vastu max py-12">
@@ -223,17 +244,17 @@ const CompareVehicles = () => {
       </div>
 
       {/* Specifications Scrollable Table */}
-      <div className="mt-6 overflow-auto max-h-[75vh] rounded-3xl border border-slate-200/80 bg-white shadow-soft relative">
-        <table className="w-full border-collapse text-left text-xs sm:text-sm min-w-[750px]">
+      <div className="mt-6 overflow-auto max-h-[85vh] lg:max-h-[750px] rounded-3xl border border-slate-200/80 bg-white shadow-soft relative">
+        <table className="w-full border-separate border-spacing-0 text-left text-xs sm:text-sm min-w-[750px]">
           <thead>
-            <tr className="bg-slate-50 border-b border-border">
+            <tr>
               {/* Top-Left Corner Cell: Sticky in both directions (z-40) */}
-              <th className="sticky left-0 top-0 z-40 bg-slate-100 p-4 border-r border-border/50 shadow-[2px_2px_5px_-2px_rgba(0,0,0,0.07)] min-w-[180px] sm:min-w-[240px]">
+              <th className="sticky left-0 top-0 z-40 bg-slate-100 p-4 border-b border-r border-slate-200/80 shadow-[2px_2px_5px_-2px_rgba(0,0,0,0.07)] min-w-[180px] sm:min-w-[240px]">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-black text-text uppercase tracking-wider">Compare Deck</span>
-                  <Link to="/vehicles">
+                  <Link to={isCommercial ? "/buy/commercial" : "/buy/cars"}>
                     <Button size="sm" variant="outline" icon={Plus} className="rounded-xl w-full text-xs py-1.5 px-3">
-                      Add Cars
+                      {isCommercial ? "Add CVs" : "Add Cars"}
                     </Button>
                   </Link>
                 </div>
@@ -242,8 +263,8 @@ const CompareVehicles = () => {
                 /* Header Cells: Sticky on Top (z-30) */
                 <th
                   key={car._id}
-                  className={`sticky top-0 z-30 bg-slate-50 p-4 border-l border-border/40 text-left min-w-[210px] ${
-                    idx === bestVastuIndex ? 'bg-emerald-50/20' : ''
+                  className={`sticky top-0 z-30 p-4 border-b border-l border-slate-200/60 text-left min-w-[210px] ${
+                    idx === bestVastuIndex ? 'bg-[#f0fdf4]' : 'bg-slate-50'
                   }`}
                 >
                   <div className="relative flex flex-col h-full">
@@ -257,10 +278,10 @@ const CompareVehicles = () => {
                     </button>
 
                     {/* Image */}
-                    <div className="aspect-[16/10] overflow-hidden rounded-xl bg-slate-100 mb-2 mt-6">
+                    <div className="h-28 overflow-hidden rounded-xl bg-slate-100 mb-2 mt-4">
                       <img
                         src={car.images?.[0]}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain bg-slate-50"
                         alt={car.name}
                       />
                     </div>
@@ -300,7 +321,7 @@ const CompareVehicles = () => {
             {specRows.map((row, index) => (
               <tr key={index} className="hover:bg-slate-50/50 transition-colors">
                 {/* Left Parameter Column: Sticky on Left (z-20) */}
-                <td className="sticky left-0 bg-white z-20 py-3.5 px-4 font-semibold text-text-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] border-r border-border/50">
+                <td className="sticky left-0 bg-white z-20 py-5 px-6 font-semibold text-text-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] border-r border-b border-slate-200/80">
                   {row.label}
                 </td>
                 {vehicles.map((car) => {
@@ -309,7 +330,7 @@ const CompareVehicles = () => {
                   const { className: highlightClass } = getCellStyle(row.key, val, row.isNested);
 
                   return (
-                    <td key={car._id} className={`py-3.5 px-4 font-bold border-l border-border/40 text-text ${highlightClass}`}>
+                    <td key={car._id} className={`py-5 px-6 font-bold border-l border-b border-slate-200/60 text-text ${highlightClass || 'bg-white'}`}>
                       {displayVal}
                     </td>
                   );
@@ -319,11 +340,11 @@ const CompareVehicles = () => {
 
             {/* Pros Row */}
             <tr className="hover:bg-slate-50/50 transition-colors">
-              <td className="sticky left-0 bg-white z-20 py-3.5 px-4 font-semibold text-text-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] border-r border-border/50">
+              <td className="sticky left-0 bg-white z-20 py-5 px-6 font-semibold text-text-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] border-r border-b border-slate-200/80">
                 Key Pros
               </td>
               {vehicles.map((car, idx) => (
-                <td key={car._id} className={`py-3.5 px-4 border-l border-border/40 text-xs font-medium ${idx === bestVastuIndex ? 'bg-emerald-50/30 text-emerald-900' : 'text-text-muted'}`}>
+                <td key={car._id} className={`py-5 px-6 border-l border-b border-slate-200/60 text-xs font-medium ${idx === bestVastuIndex ? 'bg-[#e6fcf5] text-emerald-900' : 'text-text-muted bg-white'}`}>
                   <ul className="list-disc pl-4 space-y-1">
                     {car.specifications?.pros?.map((p, i) => (
                       <li key={i}>{p}</li>
@@ -335,11 +356,11 @@ const CompareVehicles = () => {
 
             {/* Cons Row */}
             <tr className="hover:bg-slate-50/50 transition-colors">
-              <td className="sticky left-0 bg-white z-20 py-3.5 px-4 font-semibold text-text-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] border-r border-border/50">
+              <td className="sticky left-0 bg-white z-20 py-5 px-6 font-semibold text-text-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] border-r border-b border-slate-200/80">
                 Key Cons
               </td>
               {vehicles.map((car) => (
-                <td key={car._id} className="py-3.5 px-4 border-l border-border/40 text-xs text-red-800 bg-red-50/10 font-medium">
+                <td key={car._id} className="py-5 px-6 border-l border-b border-slate-200/60 text-xs text-red-800 bg-[#fff5f5] font-medium">
                   <ul className="list-disc pl-4 space-y-1">
                     {car.specifications?.cons?.map((c, i) => (
                       <li key={i}>{c}</li>

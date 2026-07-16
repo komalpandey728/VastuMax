@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import ErrorBoundary from '../components/ui/ErrorBoundary';
 import NotFound from '../pages/NotFound';
@@ -33,6 +33,13 @@ const PageLoader = () => (
   </div>
 );
 
+const VehiclesRedirect = () => {
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get('search');
+  const to = search ? `/buy/cars?search=${encodeURIComponent(search)}` : '/buy/cars';
+  return <Navigate to={to} replace />;
+};
+
 const AppRoutes = () => {
   return (
     <ErrorBoundary>
@@ -50,7 +57,7 @@ const AppRoutes = () => {
             <Route path="buy/cars" element={<VehicleCatalog />} />
             <Route path="buy/commercial" element={<CommercialVehicleCatalog />} />
             <Route path="vehicle/:id" element={<VehicleDetails />} />
-            <Route path="vehicles" element={<Navigate to="/buy/cars" replace />} />
+            <Route path="vehicles" element={<VehiclesRedirect />} />
             <Route path="account" element={<Navigate to="/customer/wishlist" replace />} />
             <Route path="admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="vendor-onboarding" element={<VendorOnboarding />} />
@@ -72,6 +79,15 @@ const AppRoutes = () => {
               path="customer/wishlist"
               element={
                 <ProtectedRoute allowedRoles={['customer']}>
+                  <CustomerWishlist />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="vendor/wishlist"
+              element={
+                <ProtectedRoute allowedRoles={['vendor']}>
                   <CustomerWishlist />
                 </ProtectedRoute>
               }

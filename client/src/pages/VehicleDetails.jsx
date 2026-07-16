@@ -10,6 +10,7 @@ import {
   Scale,
   MapPin,
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   Check,
   AlertCircle,
@@ -69,9 +70,85 @@ const VehicleDetails = () => {
   const loadAllDetails = useCallback(async () => {
     try {
       const res = await getVehicle(id);
-      setVehicle(res.vehicle);
-      setVendorProfile(res.vendorProfile);
-      setSelectedPhoto(res.vehicle.images?.[0] || '');
+      const vehicleData = { ...res.vehicle };
+      const brand = vehicleData.brand;
+      const modelLower = (vehicleData.model || '').toLowerCase();
+      const variantLower = (vehicleData.variant || '').toLowerCase();
+
+      if (brand === 'Maruti Suzuki' && modelLower === 'swift') {
+        vehicleData.images = [
+          'https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/12028/1774511780726/exterior-image-166.jpg?tr=w-420',
+          'https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/12028/1774511780726/exterior-image-166.jpg?tr=w-420',
+          'https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/12028/1774511780726/exterior-image-166.jpg?tr=w-420',
+          'https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/12028/1774511780726/exterior-image-166.jpg?tr=w-420',
+          'https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Swift/12028/1774511780726/exterior-image-166.jpg?tr=w-420'
+        ];
+      } else if (brand === 'Hyundai' && modelLower === 'creta') {
+        if (variantLower.includes('sx(o)')) {
+          vehicleData.images = [
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/53327/hyundai-creta-right-side-view10.jpeg?wm=1&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/53327/hyundai-creta-right-side-view10.jpeg?wm=1&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/53327/hyundai-creta-right-side-view10.jpeg?wm=1&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/53327/hyundai-creta-right-side-view10.jpeg?wm=1&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/53327/hyundai-creta-right-side-view10.jpeg?wm=1&q=80'
+          ];
+        } else if (variantLower.includes('sx')) {
+          vehicleData.images = [
+            'https://imgd.aeplcdn.com/642x361/n/cw/ec/182021/hyundai-creta-front-view5.jpeg?isig=0&q=75',
+            'https://imgd.aeplcdn.com/642x361/n/cw/ec/182021/hyundai-creta-left-front-three-quarter1.jpeg?isig=0&q=75',
+            'https://imgd.aeplcdn.com/642x361/n/cw/ec/182021/hyundai-creta-left-rear-three-quarter3.jpeg?isig=0&q=75',
+            'https://imgd.aeplcdn.com/642x361/n/cw/ec/182021/hyundai-creta-front-view5.jpeg?isig=0&q=75',
+            'https://imgd.aeplcdn.com/642x361/n/cw/ec/182021/hyundai-creta-left-front-three-quarter1.jpeg?isig=0&q=75'
+          ];
+        }
+      } else if (brand === 'Hyundai' && modelLower === 'i20') {
+        if (variantLower.includes('magna')) {
+          vehicleData.images = [
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/Grand-i10-Nios/10096/1684298344769/front-view-118.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/Grand-i10-Nios/10096/1684298344769/side-view-(left)-90.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/Grand-i10-Nios/10096/1684298344769/rear-left-view-121.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/Grand-i10-Nios/10088/1739512983356/exterior-image-165.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/Grand-i10-Nios/10096/1684298344769/front-view-118.jpg'
+          ];
+        } else if (variantLower.includes('asta')) {
+          vehicleData.images = [
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/i20/11092/1755058597906/front-view-118.jpg?tr=w-420',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/i20/11092/1755058597906/side-view-(left)-90.jpg?tr=w-420',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/i20/11092/1755058597906/side-view-(left)-90.jpg?tr=w-420',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/i20/11092/1755058597906/side-view-(left)-90.jpg?tr=w-420',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/i20/11092/1755058597906/front-right-view-120.jpg?tr=w-420'
+          ];
+        }
+      } else if (brand === 'Mahindra' && modelLower === 'thar') {
+        vehicleData.images = [
+          'https://imgd.aeplcdn.com/370x208/n/cw/ec/204996/thar-2025-exterior-left-rear-three-quarter.jpeg?isig=0&q=80',
+          'https://imgd.aeplcdn.com/370x208/n/cw/ec/210859/thar-facelift-2025-exterior-left-rear-three-quarter.jpeg?isig=0&q=80',
+          'https://imgd.aeplcdn.com/370x208/n/cw/ec/204996/thar-2025-exterior-left-rear-three-quarter.jpeg?isig=0&q=80',
+          'https://imgd.aeplcdn.com/370x208/n/cw/ec/204996/thar-2025-exterior-left-rear-three-quarter.jpeg?isig=0&q=80',
+          'https://imgd.aeplcdn.com/370x208/n/cw/ec/204996/thar-2025-exterior-left-rear-three-quarter.jpeg?isig=0&q=80'
+        ];
+      } else if (brand === 'Toyota' && modelLower === 'fortuner') {
+        if (variantLower.includes('legender')) {
+          vehicleData.images = [
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Fortuner-Legender/10229/1749010740042/rear-right-side-48.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Fortuner-Legender/10229/1749726924621/exterior-image-165.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Fortuner-Legender/10229/1749726924621/exterior-image-166.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Fortuner-Legender/10229/1749010740042/rear-right-side-48.jpg',
+            'https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Fortuner-Legender/10229/1749726924621/exterior-image-165.jpg'
+          ];
+        } else {
+          vehicleData.images = [
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/44709/fortuner-exterior-right-front-three-quarter-7.jpeg?isig=0&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/44709/fortuner-exterior-right-side-view-3.jpeg?isig=0&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/44709/fortuner-exterior-right-rear-three-quarter-2.jpeg?isig=0&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/44709/fortuner-exterior-right-rear-three-quarter-2.jpeg?isig=0&q=80',
+            'https://imgd.aeplcdn.com/370x208/n/cw/ec/44709/fortuner-exterior-left-rear-three-quarter-4.jpeg?isig=0&q=80'
+          ];
+        }
+      }
+
+      setVehicle(vehicleData);
+      setSelectedPhoto(vehicleData.images?.[0] || '');
 
       // Load Q&A list
       const qRes = await getVehicleQuestions(id);
@@ -103,8 +180,8 @@ const VehicleDetails = () => {
       toast.error('Please login to save vehicles.');
       return;
     }
-    if (user.role !== 'customer') {
-      toast.error('Only Customer accounts can save vehicles.');
+    if (user.role !== 'customer' && user.role !== 'vendor') {
+      toast.error('Only Customer and Vendor accounts can save vehicles.');
       return;
     }
 
@@ -248,6 +325,21 @@ const VehicleDetails = () => {
   const vLng = vehicle.location?.coordinates?.[0] || 0;
   const vLat = vehicle.location?.coordinates?.[1] || 0;
 
+  // Image switching handlers for arrow navigation
+  const handlePrevImage = () => {
+    if (!vehicle.images || vehicle.images.length === 0) return;
+    const currentIndex = vehicle.images.indexOf(selectedPhoto || vehicle.images[0]);
+    const prevIndex = (currentIndex - 1 + vehicle.images.length) % vehicle.images.length;
+    setSelectedPhoto(vehicle.images[prevIndex]);
+  };
+
+  const handleNextImage = () => {
+    if (!vehicle.images || vehicle.images.length === 0) return;
+    const currentIndex = vehicle.images.indexOf(selectedPhoto || vehicle.images[0]);
+    const nextIndex = (currentIndex + 1) % vehicle.images.length;
+    setSelectedPhoto(vehicle.images[nextIndex]);
+  };
+
   return (
     <div className="container-vastu max py-12">
       {/* Breadcrumb */}
@@ -266,7 +358,7 @@ const VehicleDetails = () => {
           {/* Media Player Container */}
           <div className="space-y-4">
             {/* Media Viewer Frame */}
-            <div className="relative overflow-hidden rounded-3xl bg-slate-900 aspect-video w-full border border-border shadow-soft flex items-center justify-center">
+            <div className="relative overflow-hidden rounded-3xl bg-slate-900 aspect-video w-full border border-border shadow-soft flex items-center justify-center group">
               <img
                 src={selectedPhoto || vehicle.images?.[0] || fallbackMediaImage}
                 className="h-full w-full object-contain"
@@ -275,6 +367,28 @@ const VehicleDetails = () => {
                   e.currentTarget.src = fallbackMediaImage;
                 }}
               />
+              
+              {/* Navigation Arrows */}
+              {vehicle.images && vehicle.images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePrevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-slate-950/60 hover:bg-slate-950/80 text-white rounded-full p-2.5 transition-colors border border-white/10 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                    aria-label="Previous Image"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-slate-950/60 hover:bg-slate-950/80 text-white rounded-full p-2.5 transition-colors border border-white/10 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                    aria-label="Next Image"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Thumbnail selector for Photos */}
@@ -360,10 +474,6 @@ const VehicleDetails = () => {
                   <div className="flex justify-between py-2.5">
                     <span className="font-semibold text-text-muted">Gross Vehicle Weight (GVW)</span>
                     <span className="font-bold text-text">{vehicle.specifications?.gvw || 'Not available'}</span>
-                  </div>
-                  <div className="flex justify-between py-2.5">
-                    <span className="font-semibold text-text-muted">Number of Tyres</span>
-                    <span className="font-bold text-text">{vehicle.specifications?.numTyres || '4'} Tyres</span>
                   </div>
                   <div className="flex justify-between py-2.5">
                     <span className="font-semibold text-text-muted">Cargo Body Type</span>

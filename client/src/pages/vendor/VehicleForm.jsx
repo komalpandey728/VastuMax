@@ -18,11 +18,11 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import toast from 'react-hot-toast';
 
-const CAR_BRANDS = ['Maruti Suzuki', 'Hyundai', 'Tata Motors', 'Mahindra', 'Toyota', 'Kia', 'Honda', 'BMW', 'Tesla', 'Skoda', 'Jeep', 'MG'];
-const CV_BRANDS = ['Tata Motors', 'Ashok Leyland', 'Mahindra', 'Eicher', 'BharatBenz', 'Force Motors'];
+const CAR_BRANDS = ['Maruti Suzuki', 'Hyundai', 'Tata Motors', 'Mahindra', 'Toyota', 'Kia', 'Honda', 'BMW', 'Skoda', 'Jeep', 'MG'];
+const CV_BRANDS = ['Tata Motors', 'Ashok Leyland', 'Mahindra', 'Eicher'];
 
 const CAR_BODY_TYPES = ['Hatchback', 'Sedan', 'SUV', 'MUV / MPV', 'Luxury', 'Coupe', 'Electric'];
-const CV_BODY_TYPES = ['Pickup', 'Mini Truck', 'Truck', 'Tempo', 'Bus', 'Tractor'];
+const CV_BODY_TYPES = ['Pickup', 'Mini Truck', 'Truck', 'Tempo', 'Tractor'];
 
 const tabs = [
   { id: 'basic', title: 'Basic Info', icon: Car },
@@ -383,7 +383,7 @@ const VehicleForm = () => {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Input
                     label="Vehicle Title / Name"
-                    placeholder={watchCategory === 'commercial' ? 'e.g. Tata Ace Gold Diesel' : 'e.g. Tesla Model Y Performance'}
+                    placeholder={watchCategory === 'commercial' ? 'e.g. Tata Ace Gold Diesel' : 'e.g. BMW M4 Competition'}
                     error={errors.name?.message}
                     {...register('name', { required: 'Name is required' })}
                   />

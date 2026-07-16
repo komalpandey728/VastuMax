@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Car, Mail, Phone, MapPin, Share2, Globe, MessageCircle, Users } from 'lucide-react';
 import { FOOTER_LINKS } from '../../constants';
+import vastuLogo from '../../assets/vastu_logo.png';
 
 const Footer = () => {
   return (
@@ -9,10 +10,7 @@ const Footer = () => {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Link to="/" className="mb-4 flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600">
-                <Car className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-text">Vastu Max</span>
+              <img src={vastuLogo} alt="Vastu Max Logo" className="h-12 w-12 rounded-full object-cover bg-white shadow-sm border border-slate-100 p-1" />
             </Link>
             <p className="mb-6 max-w-sm text-sm leading-relaxed text-text-muted">
               India's most trusted premium vehicle marketplace. Buy and sell verified

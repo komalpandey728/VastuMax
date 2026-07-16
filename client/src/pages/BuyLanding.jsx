@@ -38,7 +38,7 @@ const BuyLanding = () => {
               What are you looking to buy?
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-5 text-lg text-slate-300 max-w-xl mx-auto">
-              Choose your vehicle category. Every listing on Vastu Max is verified, RC-clear, and priced transparently.
+              Choose your vehicle category. Every listing on Vastu Max is verified, RC-clear, free from legal disputes and pending traffic penalties, and priced transparently.
             </motion.p>
           </motion.div>
         </div>
@@ -57,7 +57,7 @@ const BuyLanding = () => {
             <Link to="/buy/cars" className="block group">
               <div className="relative rounded-3xl overflow-hidden h-80 shadow-lg">
                 <img
-                  src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=500&fit=crop"
+                  src="https://c4.wallpaperflare.com/wallpaper/780/392/924/bmw-wallpaper-preview.jpg"
                   alt="Browse passenger cars on Vastu Max"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
@@ -113,7 +113,7 @@ const BuyLanding = () => {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 mb-5">
-                    {['Mini Trucks', 'Pickup Trucks', 'Tempo', 'Buses & Vans', 'Tractors', 'Three-Wheelers'].map((cat) => (
+                    {['Mini Trucks', 'Pickup Trucks', 'Tempo', 'Buses & Vans', 'Tractors'].map((cat) => (
                       <span key={cat} className="text-[11px] font-bold bg-white/15 text-white px-2.5 py-1 rounded-full border border-white/20">
                         {cat}
                       </span>
@@ -187,18 +187,18 @@ const BuyLanding = () => {
         </div>
         <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-10 gap-3">
           {[
-            { name: 'Maruti', color: 'bg-blue-50 text-blue-700 border-blue-100' },
-            { name: 'Hyundai', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
-            { name: 'Tata', color: 'bg-sky-50 text-sky-700 border-sky-100' },
-            { name: 'Mahindra', color: 'bg-red-50 text-red-700 border-red-100' },
-            { name: 'Kia', color: 'bg-violet-50 text-violet-700 border-violet-100' },
-            { name: 'Honda', color: 'bg-rose-50 text-rose-700 border-rose-100' },
-            { name: 'Toyota', color: 'bg-slate-50 text-slate-700 border-slate-200' },
-            { name: 'MG', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-            { name: 'Ashok Leyland', color: 'bg-amber-50 text-amber-700 border-amber-100' },
-            { name: 'Eicher', color: 'bg-orange-50 text-orange-700 border-orange-100' },
+            { name: 'Maruti Suzuki', displayName: 'Maruti', logo: 'https://cdn.simpleicons.org/suzuki', color: 'bg-blue-50 text-blue-700 border-blue-100' },
+            { name: 'Hyundai', displayName: 'Hyundai', logo: 'https://cdn.simpleicons.org/hyundai', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
+            { name: 'Tata Motors', displayName: 'Tata', logo: 'https://cdn.simpleicons.org/tata', color: 'bg-sky-50 text-sky-700 border-sky-100' },
+            { name: 'Mahindra', displayName: 'Mahindra', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPm379b0tDCoZX8mhj7UWwiQrolB0JAoy40cfPIwiYXQ&s=10', color: 'bg-red-50 text-red-700 border-red-100' },
+            { name: 'Kia', displayName: 'Kia', logo: 'https://cdn.simpleicons.org/kia', color: 'bg-violet-50 text-violet-700 border-violet-100' },
+            { name: 'Honda', displayName: 'Honda', logo: 'https://cdn.simpleicons.org/honda', color: 'bg-rose-50 text-rose-700 border-rose-100' },
+            { name: 'Toyota', displayName: 'Toyota', logo: 'https://cdn.simpleicons.org/toyota', color: 'bg-slate-50 text-slate-700 border-slate-200' },
+            { name: 'MG', displayName: 'MG', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPm379b0tDCoZX8mhj7UWwiQrolB0JAoy40cfPIwiYXQ&s=10', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+            { name: 'Ashok Leyland', displayName: 'Ashok Leyland', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQi97BsPcFKCQvBV3Dv54G4EqXlKALg2XnSLJVH01N2w&s=10', color: 'bg-amber-50 text-amber-700 border-amber-100' },
+            { name: 'Eicher', displayName: 'Eicher', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzAwuVW3gS-PpXO9Ro7eKPRxBYA3UiDvLFG9O7BPWERA&s=10', color: 'bg-orange-50 text-orange-700 border-orange-100' },
           ].map((brand) => {
-            const isCV = ['Ashok Leyland', 'Eicher'].includes(brand.name);
+            const isCV = ['Ashok Leyland', 'Eicher'].includes(brand.displayName);
             const targetUrl = isCV
               ? `/buy/commercial?brand=${encodeURIComponent(brand.name)}`
               : `/buy/cars?brand=${encodeURIComponent(brand.name)}`;
@@ -206,12 +206,12 @@ const BuyLanding = () => {
               <Link
                 key={brand.name}
                 to={targetUrl}
-                className={`flex flex-col items-center gap-2 p-3 rounded-2xl border ${brand.color} hover:shadow-md transition-all hover:-translate-y-1 text-center`}
+                className={`flex flex-col items-center gap-2.5 p-3 rounded-2xl border ${brand.color} hover:shadow-md transition-all hover:-translate-y-1 text-center`}
               >
-                <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-black text-lg bg-white shadow-sm border ${brand.color.split(' ').pop()}`}>
-                  {brand.name.charAt(0)}
+                <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-white shadow-sm border border-slate-100 p-1.5 overflow-hidden">
+                  <img src={brand.logo} alt={brand.displayName} className="h-full w-full object-contain" />
                 </div>
-                <span className="text-[10px] font-bold leading-tight">{brand.name}</span>
+                <span className="text-[10px] font-bold leading-tight">{brand.displayName}</span>
               </Link>
             );
           })}

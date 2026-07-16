@@ -133,13 +133,33 @@ exports.getVehicles = asyncHandler(async (req, res, next) => {
 
   // Text search
   if (req.query.search) {
-    const searchRegex = new RegExp(req.query.search, 'i');
-    queryObj.$or = [
-      { name: searchRegex },
-      { brand: searchRegex },
-      { model: searchRegex },
-      { description: searchRegex },
-    ];
+    const q = req.query.search;
+    const startRegex = new RegExp(`^${q}`, 'i');
+    const containRegex = new RegExp(q, 'i');
+    
+    const count = await Vehicle.countDocuments({
+      status: VEHICLE_STATUS.ACTIVE,
+      $or: [
+        { name: startRegex },
+        { brand: startRegex },
+        { model: startRegex }
+      ]
+    });
+
+    if (count > 0) {
+      queryObj.$or = [
+        { name: startRegex },
+        { brand: startRegex },
+        { model: startRegex }
+      ];
+    } else {
+      queryObj.$or = [
+        { name: containRegex },
+        { brand: containRegex },
+        { model: containRegex },
+        { description: containRegex }
+      ];
+    }
   }
 
   // Exact Match filters
@@ -147,11 +167,46 @@ exports.getVehicles = asyncHandler(async (req, res, next) => {
   if (req.query.model) queryObj.model = req.query.model;
   if (req.query.fuel) queryObj.fuel = req.query.fuel;
   if (req.query.transmission) queryObj.transmission = req.query.transmission;
-  if (req.query.ownership) queryObj.ownership = req.query.ownership;
+  if (req.query.ownership) {
+    const ownMap = {
+      '1st Owner': 'First Owner',
+      '2nd Owner': 'Second Owner',
+      '3rd Owner': 'Third Owner',
+      '3rd Owner or more': ['Third Owner', 'Fourth Owner+'],
+      'First Owner': 'First Owner',
+      'Second Owner': 'Second Owner',
+      'Third Owner': 'Third Owner',
+      'Fourth Owner+': 'Fourth Owner+',
+    };
+    const mapped = ownMap[req.query.ownership];
+    if (Array.isArray(mapped)) {
+      queryObj.ownership = { $in: mapped };
+    } else if (mapped) {
+      queryObj.ownership = mapped;
+    } else {
+      queryObj.ownership = req.query.ownership;
+    }
+  }
   if (req.query.city) queryObj['location.city'] = new RegExp(`^${req.query.city}$`, 'i');
 
   if (req.query.bodyType) {
-    queryObj['specifications.bodyType'] = req.query.bodyType;
+    const cleanBodyType = req.query.bodyType.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const regexPattern = cleanBodyType.split('').join('.*');
+    const regex = new RegExp(regexPattern, 'i');
+    const bodyTypeQuery = {
+      $or: [
+        { bodyType: regex },
+        { 'specifications.bodyType': regex }
+      ]
+    };
+    if (queryObj.$and) {
+      queryObj.$and.push(bodyTypeQuery);
+    } else if (queryObj.$or) {
+      queryObj.$and = [{ $or: queryObj.$or }, bodyTypeQuery];
+      delete queryObj.$or;
+    } else {
+      queryObj.$or = bodyTypeQuery.$or;
+    }
   }
 
   // CV specifications queries

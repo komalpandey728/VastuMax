@@ -24,12 +24,12 @@ const VehicleCard = ({ vehicle, onCompareToggle, isCompared, wishlistIds = [], o
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      toast.error('Please login as a Customer to save vehicles.');
+      toast.error('Please login to save vehicles.');
       return;
     }
 
-    if (user.role !== 'customer') {
-      toast.error('Only Customer accounts can save vehicles.');
+    if (user.role !== 'customer' && user.role !== 'vendor') {
+      toast.error('Only Customer and Dealer/Vendor accounts can save vehicles.');
       return;
     }
 
@@ -146,7 +146,7 @@ const VehicleCard = ({ vehicle, onCompareToggle, isCompared, wishlistIds = [], o
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-slate-500 bg-slate-100 rounded px-1.5 py-0.5 text-[10px]">
-                    {vehicle.specifications?.numTyres || '4'} Tyres
+                    {vehicle.fuel}
                   </span>
                 </div>
               </>

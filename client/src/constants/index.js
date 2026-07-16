@@ -59,14 +59,16 @@ export const FOOTER_LINKS = {
 };
 
 export const POPULAR_BRANDS = [
-  { name: 'Maruti Suzuki', logo: 'https://logo.clearbit.com/marutisuzuki.com' },
-  { name: 'Hyundai', logo: 'https://logo.clearbit.com/hyundai.com' },
-  { name: 'Tata', logo: 'https://logo.clearbit.com/tatamotors.com' },
-  { name: 'Mahindra', logo: 'https://logo.clearbit.com/mahindra.com' },
-  { name: 'Honda', logo: 'https://logo.clearbit.com/honda.com' },
-  { name: 'Toyota', logo: 'https://logo.clearbit.com/toyota.com' },
-  { name: 'Kia', logo: 'https://logo.clearbit.com/kia.com' },
-  { name: 'BMW', logo: 'https://logo.clearbit.com/bmw.com' },
+  { name: 'Maruti Suzuki', logo: 'https://cdn.simpleicons.org/suzuki' },
+  { name: 'Hyundai', logo: 'https://cdn.simpleicons.org/hyundai' },
+  { name: 'Tata Motors', logo: 'https://cdn.simpleicons.org/tata' },
+  { name: 'Mahindra', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPm379b0tDCoZX8mhj7UWwiQrolB0JAoy40cfPIwiYXQ&s=10' },
+  { name: 'Honda', logo: 'https://cdn.simpleicons.org/honda' },
+  { name: 'Toyota', logo: 'https://cdn.simpleicons.org/toyota' },
+  { name: 'Kia', logo: 'https://cdn.simpleicons.org/kia' },
+  { name: 'MG', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPm379b0tDCoZX8mhj7UWwiQrolB0JAoy40cfPIwiYXQ&s=10' },
+  { name: 'Ashok Leyland', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQi97BsPcFKCQvBV3Dv54G4EqXlKALg2XnSLJVH01N2w&s=10' },
+  { name: 'Eicher', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzAwuVW3gS-PpXO9Ro7eKPRxBYA3UiDvLFG9O7BPWERA&s=10' }
 ];
 
 export const VEHICLE_CATEGORIES = [

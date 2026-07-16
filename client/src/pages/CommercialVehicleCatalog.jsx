@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   User,
   Wrench,
-  Navigation
+  Navigation,
+  Scale
 } from 'lucide-react';
 import { getVehicles } from '../services/vehicleService';
 import { getBrands, getCities } from '../services/adminService';
@@ -53,10 +54,8 @@ const CommercialVehicleCatalog = () => {
   const brandVal = searchParams.get('brand') || '';
   const fuelVal = searchParams.get('fuel') || '';
   const bodyTypeVal = searchParams.get('bodyType') || '';
-  const numTyresVal = searchParams.get('numTyres') || '';
   const payloadVal = searchParams.get('payloadCapacity') || '';
   const permitVal = searchParams.get('permitType') || '';
-  const fitnessVal = searchParams.get('fitnessStatus') || '';
   const cityVal = searchParams.get('city') || '';
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
@@ -79,13 +78,11 @@ const CommercialVehicleCatalog = () => {
 
   const CV_BRANDS = ['Tata Motors', 'Ashok Leyland', 'Mahindra', 'Eicher', 'BharatBenz', 'Force Motors', 'Piaggio'];
   const CV_CATEGORIES = [
-    { label: 'Pickup', value: 'pickup', icon: '🛻' },
-    { label: 'Mini Truck', value: 'mini-truck', icon: '🚚' },
-    { label: 'Truck (L/M/H)', value: 'truck', icon: '🚛' },
-    { label: 'Tempo Traveller', value: 'tempo', icon: '🚐' },
-    { label: 'Bus (School/Staff)', value: 'bus', icon: '🚌' },
-    { label: 'Tractor', value: 'tractor', icon: '🚜' },
-    { label: 'Tipper', value: 'tipper', icon: '🏗️' }
+    { label: 'Pickup', value: 'pickup' },
+    { label: 'Mini Truck', value: 'mini-truck' },
+    { label: 'Truck (L/M/H)', value: 'truck' },
+    { label: 'Tempo Traveller', value: 'tempo' },
+    { label: 'Tractor', value: 'tractor' }
   ];
 
   // Load filter options
@@ -204,6 +201,15 @@ const CommercialVehicleCatalog = () => {
     }
   };
 
+  const handleCompareGo = () => {
+    const ids = comparedCars.map((c) => c._id).join(',');
+    if (!ids) {
+      toast.error('Select at least one commercial vehicle to compare.');
+      return;
+    }
+    navigate(`/compare?ids=${ids}`);
+  };
+
   const handleClearCompare = () => {
     setComparedCars([]);
     localStorage.removeItem('vastu_compare_ids');
@@ -272,7 +278,6 @@ const CommercialVehicleCatalog = () => {
                         : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
                     }`}
                   >
-                    <span>{cat.icon}</span>
                     <span>{cat.label}</span>
                   </button>
                 );
@@ -346,123 +351,8 @@ const CommercialVehicleCatalog = () => {
               )}
             </Card>
 
-            {/* Payload Filter */}
-            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
-              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Payload / Load Capacity</h3>
-              <div className="flex flex-col gap-2 text-xs">
-                {[
-                  { label: 'Under 1 Ton', val: '750 kg' },
-                  { label: '1 - 2 Tons', val: '1.5 Tons' },
-                  { label: 'Above 2 Tons', val: '3.5 Tons' }
-                ].map((p) => (
-                  <label key={p.label} className="flex items-center gap-2 font-medium cursor-pointer">
-                    <input
-                      type="radio"
-                      name="payloadRadio"
-                      checked={payloadVal === p.val}
-                      onChange={() => updateParam('payloadCapacity', p.val)}
-                      className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500/20"
-                    />
-                    <span>{p.label}</span>
-                  </label>
-                ))}
-                {payloadVal && (
-                  <button onClick={() => updateParam('payloadCapacity', '')} className="text-[10px] text-red-500 hover:underline self-start">
-                    Clear payload filter
-                  </button>
-                )}
-              </div>
-            </Card>
-
-            {/* Tyres Filter */}
-            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
-              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Number of Tyres</h3>
-              <div className="flex flex-col gap-2 text-xs">
-                {['4', '6', '10', '12', '14+'].map((tyres) => (
-                  <label key={tyres} className="flex items-center gap-2 font-medium cursor-pointer">
-                    <input
-                      type="radio"
-                      name="tyresRadio"
-                      checked={numTyresVal === tyres}
-                      onChange={() => updateParam('numTyres', tyres)}
-                      className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500/20"
-                    />
-                    <span>{tyres} Tyres</span>
-                  </label>
-                ))}
-                {numTyresVal && (
-                  <button onClick={() => updateParam('numTyres', '')} className="text-[10px] text-red-500 hover:underline self-start">
-                    Clear tyres filter
-                  </button>
-                )}
-              </div>
-            </Card>
-
-            {/* Permit Type */}
-            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
-              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">RTO Permit Type</h3>
-              <div className="flex flex-col gap-2 text-xs">
-                {['National Permit', 'State Permit'].map((permit) => (
-                  <label key={permit} className="flex items-center gap-2 font-medium cursor-pointer">
-                    <input
-                      type="radio"
-                      name="permitRadio"
-                      checked={permitVal === permit}
-                      onChange={() => updateParam('permitType', permit)}
-                      className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500/20"
-                    />
-                    <span>{permit}</span>
-                  </label>
-                ))}
-                {permitVal && (
-                  <button onClick={() => updateParam('permitType', '')} className="text-[10px] text-red-500 hover:underline self-start">
-                    Clear permit filter
-                  </button>
-                )}
-              </div>
-            </Card>
-
-            {/* Budget filter */}
-            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
-              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Price Range</h3>
-              <PriceSlider
-                min={0}
-                max={5000000}
-                initialMin={minPrice ? Number(minPrice) : undefined}
-                initialMax={maxPrice ? Number(maxPrice) : undefined}
-                onChange={({ min, max }) => {
-                  updateParam('minPrice', min ? min.toString() : '');
-                  updateParam('maxPrice', max ? max.toString() : '');
-                }}
-              />
-            </Card>
-
-            {/* Fuel Type */}
-            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
-              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Fuel Option</h3>
-              <div className="flex flex-col gap-2 text-xs">
-                {['Diesel', 'CNG', 'Electric'].map((f) => (
-                  <label key={f} className="flex items-center gap-2 font-medium cursor-pointer">
-                    <input
-                      type="radio"
-                      name="cvFuelRadio"
-                      checked={fuelVal === f}
-                      onChange={() => updateParam('fuel', f)}
-                      className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500/20"
-                    />
-                    <span>{f}</span>
-                  </label>
-                ))}
-                {fuelVal && (
-                  <button onClick={() => updateParam('fuel', '')} className="text-[10px] text-red-500 hover:underline self-start">
-                    Deselect fuel
-                  </button>
-                )}
-              </div>
-            </Card>
-
-            {/* RTO Cities Autocomplete search */}
-            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
+            {/* RTO Registered City (Repositioned to top to prevent clipping) */}
+            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft relative z-30">
               <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">RTO Registered City</h3>
               <div className="relative mt-2">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-muted" />
@@ -518,6 +408,97 @@ const CommercialVehicleCatalog = () => {
                 </div>
               )}
             </Card>
+
+            {/* Payload Filter */}
+            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
+              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Payload / Load Capacity</h3>
+              <div className="flex flex-col gap-2 text-xs">
+                {[
+                  { label: 'Under 1 Ton', val: 'under_1' },
+                  { label: '1 - 5 Tons', val: '1_5' },
+                  { label: 'Above 5 Tons', val: 'above_5' }
+                ].map((p) => (
+                  <label key={p.label} className="flex items-center gap-2 font-medium cursor-pointer">
+                    <input
+                      type="radio"
+                      name="payloadRadio"
+                      checked={payloadVal === p.val}
+                      onChange={() => updateParam('payloadCapacity', p.val)}
+                      className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500/20"
+                    />
+                    <span>{p.label}</span>
+                  </label>
+                ))}
+                {payloadVal && (
+                  <button onClick={() => updateParam('payloadCapacity', '')} className="text-[10px] text-red-500 hover:underline self-start">
+                    Clear payload filter
+                  </button>
+                )}
+              </div>
+            </Card>
+
+            {/* Permit Type */}
+            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
+              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">RTO Permit Type</h3>
+              <div className="flex flex-col gap-2 text-xs">
+                {['National Permit', 'State Permit'].map((permit) => (
+                  <label key={permit} className="flex items-center gap-2 font-medium cursor-pointer">
+                    <input
+                      type="radio"
+                      name="permitRadio"
+                      checked={permitVal === permit}
+                      onChange={() => updateParam('permitType', permit)}
+                      className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500/20"
+                    />
+                    <span>{permit}</span>
+                  </label>
+                ))}
+                {permitVal && (
+                  <button onClick={() => updateParam('permitType', '')} className="text-[10px] text-red-500 hover:underline self-start">
+                    Clear permit filter
+                  </button>
+                )}
+              </div>
+            </Card>
+
+            {/* Budget filter */}
+            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
+              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Price Range</h3>
+              <PriceSlider
+                min={200000}
+                max={5000000}
+                initialMin={minPrice ? Number(minPrice) : undefined}
+                initialMax={maxPrice ? Number(maxPrice) : undefined}
+                onChange={({ min, max }) => {
+                  updateParam('minPrice', min ? min.toString() : '');
+                  updateParam('maxPrice', max ? max.toString() : '');
+                }}
+              />
+            </Card>
+
+            {/* Fuel Type */}
+            <Card className="p-4 border border-border bg-white rounded-xl shadow-soft">
+              <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Fuel Option</h3>
+              <div className="flex flex-col gap-2 text-xs">
+                {['Diesel', 'CNG', 'Electric'].map((f) => (
+                  <label key={f} className="flex items-center gap-2 font-medium cursor-pointer">
+                    <input
+                      type="radio"
+                      name="cvFuelRadio"
+                      checked={fuelVal === f}
+                      onChange={() => updateParam('fuel', f)}
+                      className="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500/20"
+                    />
+                    <span>{f}</span>
+                  </label>
+                ))}
+                {fuelVal && (
+                  <button onClick={() => updateParam('fuel', '')} className="text-[10px] text-red-500 hover:underline self-start">
+                    Deselect fuel
+                  </button>
+                )}
+              </div>
+            </Card>
           </aside>
 
           {/* Listings Hub Column */}
@@ -549,7 +530,7 @@ const CommercialVehicleCatalog = () => {
             </div>
 
             {/* Active Filters list */}
-            {(brandVal || payloadVal || numTyresVal || permitVal || fuelVal || cityVal) && (
+            {(brandVal || payloadVal || permitVal || fuelVal || cityVal) && (
               <div className="flex flex-wrap gap-2 items-center text-xs">
                 <span className="font-bold text-text-muted">Active:</span>
                 {brandVal && (
@@ -559,12 +540,7 @@ const CommercialVehicleCatalog = () => {
                 )}
                 {payloadVal && (
                   <span className="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1">
-                    Payload: {payloadVal} <X className="h-3 w-3 cursor-pointer" onClick={() => updateParam('payloadCapacity', '')} />
-                  </span>
-                )}
-                {numTyresVal && (
-                  <span className="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1">
-                    Tyres: {numTyresVal} <X className="h-3 w-3 cursor-pointer" onClick={() => updateParam('numTyres', '')} />
+                    Payload: {payloadVal === 'under_1' ? 'Under 1 Ton' : payloadVal === '1_5' ? '1 - 5 Tons' : payloadVal === 'above_5' ? 'Above 5 Tons' : payloadVal} <X className="h-3 w-3 cursor-pointer" onClick={() => updateParam('payloadCapacity', '')} />
                   </span>
                 )}
                 {permitVal && (
@@ -620,40 +596,134 @@ const CommercialVehicleCatalog = () => {
         </div>
       </div>
 
-      {/* Floating Compare Tray */}
+      {/* FLOATING ACTION BOTTOM DRAWER FOR COMPARISON LIST */}
       <AnimatePresence>
         {comparedCars.length > 0 && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur border-t border-slate-800 text-white p-4 shadow-elevated"
+            exit={{ y: 80, opacity: 0 }}
+            className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 w-[90vw] max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-elevated text-white flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md bg-opacity-95"
           >
-            <div className="container-vastu max flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-col">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">CV COMPARE TRAY</span>
-                <span className="text-xs text-slate-400 font-semibold">{comparedCars.length} of 4 vehicles selected</span>
-              </div>
-              <div className="flex flex-wrap gap-2.5 items-center">
-                {comparedCars.map((car) => (
-                  <div key={car._id} className="flex items-center gap-2 bg-slate-800/80 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-200">
-                    <span className="truncate max-w-[120px] font-bold">{car.name}</span>
-                    <button onClick={() => handleCompareToggle(car)} className="text-slate-400 hover:text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-                <div className="flex gap-2 ml-4 shrink-0">
-                  <Button size="sm" variant="outline" onClick={handleClearCompare} className="border-slate-700 hover:bg-slate-800 text-white text-xs">
-                    Clear
-                  </Button>
-                  <Button size="sm" onClick={() => navigate(`/compare?ids=${comparedCars.map(c => c._id).join(',')}`)} className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
-                    Compare Deck
-                  </Button>
+            <div className="flex items-center gap-3">
+              <Scale className="h-6 w-6 text-amber-400 shrink-0" />
+              <div>
+                <p className="text-xs font-bold text-white uppercase tracking-wider">CV Comparison Deck</p>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {comparedCars.map((car) => (
+                    <span key={car._id} className="inline-flex items-center gap-1 bg-slate-800 border border-slate-700 rounded-lg px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                      {car.brand} {car.model}
+                      <button onClick={() => handleCompareToggle(car)} className="text-slate-500 hover:text-red-400 font-bold ml-1">
+                        ×
+                      </button>
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
+            <div className="flex gap-2 shrink-0">
+              <Button size="sm" variant="secondary" className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700 rounded-xl" onClick={handleClearCompare}>
+                Clear
+              </Button>
+              <Button size="sm" variant="primary" disabled={comparedCars.length < 2} onClick={handleCompareGo} className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl border-0">
+                Compare Fleet Now ({comparedCars.length})
+              </Button>
+            </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MOBILE FILTERS DRAWER */}
+      <AnimatePresence>
+        {showMobileFilters && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end">
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              className="w-full max-w-xs bg-white h-full p-6 overflow-y-auto flex flex-col"
+            >
+              <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
+                <h3 className="font-bold text-text">Filters</h3>
+                <button onClick={() => setShowMobileFilters(false)}>
+                  <X className="h-5 w-5 text-text-muted" />
+                </button>
+              </div>
+
+              {/* Mobile Filter panels */}
+              <div className="flex-1 space-y-5">
+                {/* Proximity */}
+                <Card className="p-3 bg-slate-50 border-0 rounded-xl">
+                  <h4 className="text-xs font-bold text-text mb-2">PROXIMITY RADIAN</h4>
+                  {lat && lng ? (
+                    <Button size="xs" variant="outline" className="w-full text-red-600 border-red-200" onClick={() => {
+                      searchParams.delete('lat');
+                      searchParams.delete('lng');
+                      searchParams.delete('maxDistance');
+                      setSearchParams(searchParams);
+                    }}>
+                      Clear Proximity Filter
+                    </Button>
+                  ) : (
+                    <Button size="xs" variant="primary" onClick={handleGPSProximity}>
+                      Filter Within 50km
+                    </Button>
+                  )}
+                </Card>
+
+                {/* Brands */}
+                <div>
+                  <h4 className="text-xs font-bold text-text-muted mb-2 uppercase">Brand</h4>
+                  <div className="flex flex-col gap-2">
+                    {CV_BRANDS.map((brandName) => (
+                      <label key={brandName} className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                        <input
+                          type="radio"
+                          name="mobileBrand"
+                          checked={brandVal === brandName}
+                          onChange={() => updateParam('brand', brandName)}
+                          className="h-3.5 w-3.5 text-amber-600"
+                        />
+                        <span>{brandName}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <hr className="border-border/60" />
+
+                {/* Budget */}
+                <div>
+                  <h4 className="text-xs font-bold text-text-muted mb-2 uppercase">Budget</h4>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      value={minPrice}
+                      onChange={(e) => updateParam('minPrice', e.target.value)}
+                      className="w-1/2 rounded-lg border border-border px-2.5 py-1.5 text-xs focus:outline-none"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      value={maxPrice}
+                      onChange={(e) => updateParam('maxPrice', e.target.value)}
+                      className="w-1/2 rounded-lg border border-border px-2.5 py-1.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-border flex gap-2">
+                <Button variant="outline" className="w-1/2 text-xs py-2" onClick={handleClearFilters}>
+                  Reset All
+                </Button>
+                <Button variant="primary" className="w-1/2 text-xs py-2" onClick={() => setShowMobileFilters(false)}>
+                  Apply
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

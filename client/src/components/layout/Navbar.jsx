@@ -19,8 +19,10 @@ import {
 import { NAV_LINKS } from '../../constants';
 import { useAuth } from '../../context/AuthContext';
 import { getNotifications, markNotificationRead } from '../../services/customerService';
+import { getVehicles } from '../../services/vehicleService';
 import Button from '../ui/Button';
 import toast from 'react-hot-toast';
+import vastuLogo from '../../assets/vastu_logo.png';
 
 const INDIAN_LOCATIONS = [
   "Mumbai, Maharashtra",
@@ -95,6 +97,44 @@ const Navbar = () => {
   const [userLocationCity, setUserLocationCity] = useState(() => localStorage.getItem("vastu_gps_city") || "Detect Location");
   const [manualCityInput, setManualCityInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const [allVehiclesPool, setAllVehiclesPool] = useState([]);
+
+  useEffect(() => {
+    const fetchVehiclesPool = async () => {
+      try {
+        const res = await getVehicles({ limit: 100 });
+        setAllVehiclesPool(res.vehicles || []);
+      } catch {
+        // ignore
+      }
+    };
+    fetchVehiclesPool();
+  }, []);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchSuggestions([]);
+      return;
+    }
+    const q = searchQuery.toLowerCase().trim();
+    const starting = allVehiclesPool.filter(
+      (v) =>
+        v.name.toLowerCase().startsWith(q) ||
+        v.brand.toLowerCase().startsWith(q) ||
+        v.model.toLowerCase().startsWith(q)
+    );
+    const containing = allVehiclesPool.filter(
+      (v) =>
+        !starting.includes(v) &&
+        (v.name.toLowerCase().includes(q) ||
+         v.brand.toLowerCase().includes(q) ||
+         v.model.toLowerCase().includes(q))
+    );
+    setSearchSuggestions([...starting, ...containing].slice(0, 5));
+  }, [searchQuery, allVehiclesPool]);
+
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const location = useLocation();
@@ -259,9 +299,9 @@ const Navbar = () => {
     e.preventDefault();
     const query = searchQuery.trim();
     if (query) {
-      navigate(`/vehicles?search=${encodeURIComponent(query)}`);
+      navigate(`/buy/cars?search=${encodeURIComponent(query)}`);
     } else {
-      navigate('/vehicles');
+      navigate('/buy/cars');
     }
     setSearchQuery('');
   };
@@ -281,15 +321,11 @@ const Navbar = () => {
       : '/customer/wishlist';
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
+    <>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
       <nav className="container-vastu max flex h-16 items-center justify-between lg:h-20">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600">
-            <Car className="h-5 w-5 text-white" />
-          </div>
-          <span className={`text-xl font-black tracking-tight ${textColor}`}>
-            Vastu <span className="text-primary-500">Max</span>
-          </span>
+          <img src={vastuLogo} alt="Vastu Max Logo" className="h-12 sm:h-14 w-12 sm:w-14 rounded-full object-cover bg-white shadow-md border border-slate-200 p-1" />
         </Link>
 
         <div className="hidden items-center gap-8 lg:flex">
@@ -306,17 +342,43 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <form onSubmit={handleSearchSubmit} className="items-center gap-2 rounded-2xl border border-border bg-white/90 px-3 py-1.5 shadow-soft lg:flex">
+          <form onSubmit={handleSearchSubmit} className="relative items-center gap-2 rounded-2xl border border-border bg-white/90 px-3 py-1.5 shadow-soft lg:flex">
             <Search className="h-4 w-4 text-slate-400" />
             <input
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowSearchSuggestions(true);
+              }}
+              onFocus={() => setShowSearchSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSearchSuggestions(false), 250)}
               placeholder="Search vehicles..."
               className="w-40 bg-transparent text-sm text-text outline-none placeholder:text-slate-400"
             />
             <button type="submit" className="rounded-xl bg-primary-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-primary-700">
               Go
             </button>
+
+            {showSearchSuggestions && searchSuggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-2 max-h-60 overflow-y-auto rounded-xl border border-slate-200/80 bg-white shadow-lg z-50">
+                {searchSuggestions.map((v) => (
+                  <button
+                    key={v._id}
+                    type="button"
+                    onClick={() => {
+                      navigate(`/vehicle/${v._id}`);
+                      setSearchQuery('');
+                      setShowSearchSuggestions(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2 text-xs hover:bg-slate-50 transition-colors font-semibold text-text flex items-center gap-2 cursor-pointer border-b border-slate-100 last:border-0"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />
+                    <span className="flex-1 truncate">{v.name}</span>
+                    <span className="text-[9px] text-text-muted font-normal capitalize">{v.category === 'commercial' ? 'Commercial' : v.bodyType}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </form>
 
           <button
@@ -430,7 +492,7 @@ const Navbar = () => {
                       exit={{ opacity: 0, y: 10 }}
                       className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-white py-2 shadow-[var(--shadow-elevated)] z-50"
                     >
-                      {user?.role === 'customer' ? (
+                      {user?.role === 'customer' && (
                         <Link
                           to="/customer/wishlist"
                           className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-accent/50"
@@ -438,7 +500,26 @@ const Navbar = () => {
                           <Heart className="h-4 w-4" />
                           My Wishlist
                         </Link>
-                      ) : (
+                      )}
+                      {user?.role === 'vendor' && (
+                        <>
+                          <Link
+                            to={dashboardPath}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-accent/50"
+                          >
+                            <LayoutDashboard className="h-4 w-4" />
+                            Dashboard
+                          </Link>
+                          <Link
+                            to="/vendor/wishlist"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-accent/50"
+                          >
+                            <Heart className="h-4 w-4" />
+                            My Wishlist
+                          </Link>
+                        </>
+                      )}
+                      {user?.role === 'admin' && (
                         <Link
                           to={dashboardPath}
                           className="flex items-center gap-2 px-4 py-2 text-sm text-text hover:bg-accent/50"
@@ -505,17 +586,44 @@ const Navbar = () => {
             className="border-t border-border/50 bg-white lg:hidden"
           >
             <div className="container-vastu max py-4">
-              <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 rounded-2xl border border-border bg-slate-50 px-3 py-2 shadow-soft">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center gap-2 rounded-2xl border border-border bg-slate-50 px-3 py-2 shadow-soft">
                 <Search className="h-4 w-4 text-slate-400" />
                 <input
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSearchSuggestions(true);
+                  }}
+                  onFocus={() => setShowSearchSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSearchSuggestions(false), 250)}
                   placeholder="Search vehicles..."
                   className="w-full bg-transparent text-sm text-text outline-none placeholder:text-slate-400"
                 />
                 <button type="submit" className="rounded-xl bg-primary-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-primary-700">
                   Go
                 </button>
+
+                {showSearchSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full mt-2 max-h-60 overflow-y-auto rounded-xl border border-slate-200/80 bg-white shadow-lg z-50">
+                    {searchSuggestions.map((v) => (
+                      <button
+                        key={v._id}
+                        type="button"
+                        onClick={() => {
+                          navigate(`/vehicle/${v._id}`);
+                          setSearchQuery('');
+                          setShowSearchSuggestions(false);
+                          setIsSearchOpen(false);
+                        }}
+                        className="w-full text-left px-3.5 py-2 text-xs hover:bg-slate-50 transition-colors font-semibold text-text flex items-center gap-2 cursor-pointer border-b border-slate-100 last:border-0"
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />
+                        <span className="flex-1 truncate">{v.name}</span>
+                        <span className="text-[9px] text-text-muted font-normal capitalize">{v.category === 'commercial' ? 'Commercial' : v.bodyType}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </form>
             </div>
           </motion.div>
@@ -569,85 +677,87 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Location Selector Modal */}
-      <AnimatePresence>
-        {showLocationModal && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-sm rounded-3xl border border-border bg-white p-6 shadow-elevated text-text"
-            >
-              <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
-                <h3 className="font-bold text-text flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-primary-600" />
-                  Select City Location
-                </h3>
-                <button onClick={() => setShowLocationModal(false)}>
-                  <X className="h-5 w-5 text-text-muted hover:text-text" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="relative">
-                  <label className="text-[10px] font-bold text-text-muted block mb-1">CITY / STATE NAME</label>
-                  <input
-                    type="text"
-                    placeholder="Search e.g. Mumbai, Maharashtra"
-                    value={manualCityInput}
-                    onChange={(e) => setManualCityInput(e.target.value)}
-                    className="w-full rounded-xl border border-border px-3 py-2 text-xs text-text focus:outline-none focus:border-primary-500 bg-white"
-                  />
-                  {manualCityInput.trim() && (
-                    <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-xl border border-border bg-white shadow-soft z-50 text-xs divide-y divide-slate-100">
-                      {INDIAN_LOCATIONS.filter(loc => {
-                        const q = manualCityInput.trim().toLowerCase();
-                        return loc.toLowerCase().split(/[\s,]+/).some(w => w.startsWith(q));
-                      }).map((loc) => (
-                        <button
-                          key={loc}
-                          type="button"
-                          onClick={() => {
-                            setManualCityInput(loc);
-                            handleManualLocationUpdate(loc);
-                          }}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-50 transition-colors font-semibold"
-                        >
-                          {loc}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <Button
-                  variant="primary"
-                  fullWidth
-                  onClick={() => handleManualLocationUpdate()}
-                >
-                  Set Location
-                </Button>
-
-                <div className="relative flex py-2 items-center">
-                  <div className="flex-grow border-t border-slate-200"></div>
-                  <span className="flex-shrink mx-3 text-[10px] text-slate-400 font-bold uppercase">or</span>
-                  <div className="flex-grow border-t border-slate-200"></div>
-                </div>
-
-                <Button
-                  variant="outline"
-                  fullWidth
-                  onClick={handleDetectLocation}
-                >
-                  Detect My GPS Location
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </header>
+
+    {/* Location Selector Modal (Rendered outside header to bypass backdrop-filter stacking context bugs) */}
+    <AnimatePresence>
+      {showLocationModal && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="w-full max-w-sm rounded-3xl border border-border bg-white p-6 shadow-elevated text-text"
+          >
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+              <h3 className="font-bold text-text flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-primary-600" />
+                Select City Location
+              </h3>
+              <button onClick={() => setShowLocationModal(false)}>
+                <X className="h-5 w-5 text-text-muted hover:text-text" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <label className="text-[10px] font-bold text-text-muted block mb-1">CITY / STATE NAME</label>
+                <input
+                  type="text"
+                  placeholder="Search e.g. Mumbai, Maharashtra"
+                  value={manualCityInput}
+                  onChange={(e) => setManualCityInput(e.target.value)}
+                  className="w-full rounded-xl border border-border px-3 py-2 text-xs text-text focus:outline-none focus:border-primary-500 bg-white"
+                />
+                {manualCityInput.trim() && (
+                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-xl border border-border bg-white shadow-soft z-50 text-xs divide-y divide-slate-100">
+                    {INDIAN_LOCATIONS.filter(loc => {
+                      const q = manualCityInput.trim().toLowerCase();
+                      return loc.toLowerCase().split(/[\s,]+/).some(w => w.startsWith(q));
+                    }).map((loc) => (
+                      <button
+                        key={loc}
+                        type="button"
+                        onClick={() => {
+                          setManualCityInput(loc);
+                          handleManualLocationUpdate(loc);
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-slate-50 transition-colors font-semibold"
+                      >
+                        {loc}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={() => handleManualLocationUpdate()}
+              >
+                Set Location
+              </Button>
+
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink mx-3 text-[10px] text-slate-400 font-bold uppercase">or</span>
+                <div className="flex-grow border-t border-slate-200"></div>
+              </div>
+
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={handleDetectLocation}
+              >
+                Detect My GPS Location
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </>
   );
 };
 

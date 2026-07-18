@@ -4,6 +4,8 @@ import {
   Car, Truck, ArrowRight, ShieldCheck,
   Star, Zap, IndianRupee, Clock
 } from 'lucide-react';
+import passengerCarsBg from '../assets/images/cars/passenger_cars_bg.jpg';
+import commercialVehiclesBg from '../assets/images/cv/commercial_vehicles_bg.jpg';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -57,7 +59,7 @@ const BuyLanding = () => {
             <Link to="/buy/cars" className="block group">
               <div className="relative rounded-3xl overflow-hidden h-80 shadow-lg">
                 <img
-                  src="https://c4.wallpaperflare.com/wallpaper/780/392/924/bmw-wallpaper-preview.jpg"
+                  src={passengerCarsBg}
                   alt="Browse passenger cars on Vastu Max"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
@@ -97,7 +99,7 @@ const BuyLanding = () => {
             <Link to="/buy/commercial" className="block group">
               <div className="relative rounded-3xl overflow-hidden h-80 shadow-lg">
                 <img
-                  src="https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?w=800&h=500&fit=crop"
+                  src={commercialVehiclesBg}
                   alt="Browse commercial vehicles on Vastu Max"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />

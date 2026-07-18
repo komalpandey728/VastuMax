@@ -55,7 +55,7 @@ const VehicleDetails = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [isSavedLoading, setIsSavedLoading] = useState(false);
 
-  const fallbackMediaImage = 'https://loremflickr.com/1200/800/car?lock=fallback-detail';
+  const fallbackMediaImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXowUr0p8B6jDDwbRrB4YU4I29TsjPYNTQqltd-iXoiA&s=10';
 
   // Forms
   const [bookingForm, setBookingForm] = useState({ bookingDate: '', bookingTime: '10:00 AM', notes: '' });
@@ -367,7 +367,7 @@ const VehicleDetails = () => {
                   e.currentTarget.src = fallbackMediaImage;
                 }}
               />
-              
+
               {/* Navigation Arrows */}
               {vehicle.images && vehicle.images.length > 1 && (
                 <>
@@ -398,9 +398,8 @@ const VehicleDetails = () => {
                   key={i}
                   type="button"
                   onClick={() => setSelectedPhoto(img)}
-                  className={`h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all ${
-                    selectedPhoto === img ? 'border-primary-600 scale-[0.98]' : 'border-transparent opacity-80'
-                  }`}
+                  className={`h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all ${selectedPhoto === img ? 'border-primary-600 scale-[0.98]' : 'border-transparent opacity-80'
+                    }`}
                 >
                   <img
                     src={img}
